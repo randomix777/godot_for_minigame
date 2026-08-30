@@ -4,7 +4,7 @@
 
 | Test Suite | Result | Details |
 |-----------|--------|---------|
-| Node.js tests (12) | ✅ PASS | 12/12 on Node.js v24.18.0 |
+| Node.js tests (13) | ✅ PASS | 13/13 on Node.js v24.18.0 (incl. sha256sums_test.mjs) |
 | Godot 4.6.1 headless import | ⚠️ N/A | Exit code 1 with no error output (expected for headless import) |
 | Godot 4.6.1 smoke tests (13) | ✅ PASS | 13/13 — all test/*_test.gd |
 | Export smoke (7 platforms) | ✅ PASS | wechat, douyin, tiktok, alipay, baidu, qq, kuaishou |
@@ -13,6 +13,7 @@
 | Website build | ✅ PASS | vinext build succeeds |
 | Website tests (3) | ✅ PASS | 3/3 rendered HTML tests |
 | Website lint | ✅ PASS | 0 errors, 18 warnings (img element — acceptable) |
+| SHA256SUMS validation | ✅ PASS | 64 entries, UTF-8 no BOM, LF line endings, sorted |
 
 ### Node.js Test Files (test/*.test.mjs)
 
@@ -30,6 +31,7 @@
 | release_contract.test.mjs | ✅ |
 | sdk_bridge.test.mjs | ✅ |
 | tt_platform_smoke.test.mjs | ✅ |
+| sha256sums_test.mjs | ✅ |
 
 ### Godot Test Files (test/*_test.gd) — Godot 4.6.1
 
@@ -94,6 +96,19 @@
 
 ---
 
+## Git Status
+
+| Item | Status |
+|------|--------|
+| Working tree | ✅ Clean |
+| fork/main | ✅ Synced (3 commits ahead of origin/main) |
+| origin/main | ⚠️ 3 commits behind (we are ahead) |
+| upstream/main | ⚠️ 31 commits ahead (unrelated history) |
+
+**Note**: Current `main` has 3 commits ahead of `origin/main` (AnranS/godot_for_minigame) because this is a fork. The fork (`randomix777/godot_for_minigame`) is synced.
+
+---
+
 ## Manual Gates Still Required
 
 ### 🔴 BLOCKING: Douyin Real Device Test
@@ -152,13 +167,13 @@
 
 ## Release Checklist
 
-- [x] All Node.js automated tests pass (12/12)
+- [x] All Node.js automated tests pass (13/13)
 - [x] All Godot automated tests pass (13/13 on 4.6.1)
 - [x] Export smoke test passes (7 platforms)
 - [x] Plugin packages correctly (deterministic ZIP)
 - [x] Version metadata consistent (0.3.0 everywhere)
 - [x] Website build/test/lint pass on Windows
-- [ ] **Git working tree clean** — NOT YET (uncommitted changes)
+- [x] **Git working tree clean** — ✅ Completed
 - [x] **WeChat DevTools compilation** — ✅ PASSED 2026-08-29
 - [x] **WeChat real device test** — ✅ PASSED 2026-08-29
 - [x] **Douyin DevTools compilation** — ✅ PASSED 2026-08-29
@@ -174,3 +189,4 @@
 - Do NOT create or push a git tag until all blockers are cleared
 - Do NOT mark Godot 4.7.1 as certified (template asset not available)
 - Do NOT mark experimental platforms (alipay/baidu/qq/kuaishou) as certified without DevTools verification
+- Do NOT use ttmg v0.4.5 as evidence for TikTok v0.4.1-beta.wasm1 requirement

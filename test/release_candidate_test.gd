@@ -58,7 +58,8 @@ func _init() -> void:
 	print("--- P5: Version Management ---")
 	_test_p5_support_matrix()
 	_test_p5_template_manifest()
-	_test_p5_471_pinned()
+	_test_p5_certified_godot()
+	_test_p5_planned_versions()
 
 	print("")
 	print("--- P6: Package & Performance ---")
@@ -301,17 +302,35 @@ func _test_p5_template_manifest() -> void:
 		"versions.json index exists")
 
 
-func _test_p5_471_pinned() -> void:
+func _test_p5_certified_godot() -> void:
 	var matrix = _read_json("res://support-matrix.json")
 	var certified = matrix.get("certified", [])
-	var found = false
+	# Verify 4.6.1 is certified (bundled template)
+	var found_461 = false
 	for entry in certified:
-		if str(entry.get("godotVersion", "")).contains("4.7.1"):
-			found = true
-			_assert(entry.get("godotCommit", "") == "a13da4feb8d8aefc283c3763d33a2f170a18d541",
-				"4.7.1 commit pinned")
+		if str(entry.get("godotVersion", "")) == "4.6.1.stable":
+			found_461 = true
+			_assert(entry.get("template", {}).get("source", "") == "bundled",
+				"4.6.1 certified with bundled template")
 			break
-	_assert(found, "4.7.1 in certified list")
+	_assert(found_461, "4.6.1 in certified list")
+
+
+func _test_p5_planned_versions() -> void:
+	var matrix = _read_json("res://support-matrix.json")
+	var planned = matrix.get("planned", [])
+	# Verify 4.7.1 and 4.7.2 are in planned, not certified
+	var planned_versions = []
+	for entry in planned:
+		planned_versions.append(str(entry.get("godotVersion", "")))
+	_assert("4.7.1.stable" in planned_versions, "4.7.1 in planned list")
+	_assert("4.7.2.stable" in planned_versions, "4.7.2 in planned list")
+	# Verify they are NOT in certified
+	var certified = matrix.get("certified", [])
+	for entry in certified:
+		var v = str(entry.get("godotVersion", ""))
+		_assert(v != "4.7.1.stable" and v != "4.7.2.stable",
+			"%s must not be in certified" % v)
 
 
 # ─── P6 Tests ───────────────────────────────────────────────────
@@ -398,15 +417,30 @@ func _test_p8_gitattributes() -> void:
 func _test_p8_sha256_sums() -> void:
 	_assert(FileAccess.file_exists("res://SHA256SUMS"), "SHA256SUMS exists")
 	var file := FileAccess.open("res://SHA256SUMS", FileAccess.READ)
+	_assert(file != null, "Can open SHA256SUMS")
 	if file:
 		var content = file.get_as_text()
 		file.close()
+		# Check no BOM
+		var bytes = FileAccess.open("res://SHA256SUMS", FileAccess.READ).get_buffer(3)
+		_assert(bytes.size() < 3 or bytes[0] != 0xEF or bytes[1] != 0xBB or bytes[2] != 0xBF,
+			"SHA256SUMS must not have UTF-8 BOM")
+		# Check LF line endings (no CRLF)
+		_assert(content.find("\r\n") == -1, "SHA256SUMS must use LF line endings")
+		# Parse and validate entries
 		var raw_lines = content.split("\n")
-		var line_count = 0
+		var valid_lines: Array = []
 		for line in raw_lines:
-			if line.strip_edges().length() > 0:
-				line_count += 1
-		_assert(line_count > 10, "SHA256SUMS has >10 entries (actual: %d)" % line_count)
+			var stripped = line.strip_edges()
+			if stripped.length() == 0:
+				continue
+			# Format: <64 hex chars>  <path>
+			if stripped.match("^[0-9a-f]{64}  .+$"):
+				valid_lines.append(stripped)
+			else:
+				_assert(false, "Invalid SHA256SUMS entry: %s..." % stripped.substr(0, 40))
+		_assert(valid_lines.size() > 40,
+			"SHA256SUMS has >40 valid entries (actual: %d)" % valid_lines.size())
 
 
 # ─── Helpers ────────────────────────────────────────────────────
