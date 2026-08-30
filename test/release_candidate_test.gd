@@ -88,7 +88,7 @@ func _init() -> void:
 		quit(1)
 	else:
 		print("")
-		print("✅ READY FOR v0.3.0 TAG")
+		print("✅ READY FOR v0.3.1 TAG")
 		quit(0)
 
 
@@ -128,11 +128,11 @@ func _test_p0_build_reproducibility() -> void:
 func _test_p0_version_consistency() -> void:
 	var cfg = _read_cfg("res://addons/godot_mini_game/plugin.cfg")
 	var version = _extract_cfg(cfg, "version")
-	_assert(version == "0.3.0", "plugin.cfg version = 0.3.0 (got %s)" % version)
+	_assert(version == "0.3.1", "plugin.cfg version = 0.3.1 (got %s)" % version)
 
 	var matrix = _read_json("res://support-matrix.json")
 	var mv = matrix.get("pluginVersion", "")
-	_assert(mv == "0.3.0", "support-matrix pluginVersion = 0.3.0 (got %s)" % mv)
+	_assert(mv == "0.3.1", "support-matrix pluginVersion = 0.3.1 (got %s)" % mv)
 	_assert(mv == version, "Versions match: plugin.cfg == support-matrix")
 
 
@@ -355,8 +355,8 @@ func _test_p7_plugin_cfg() -> void:
 	var cfg = _read_cfg("res://addons/godot_mini_game/plugin.cfg")
 	_assert(_extract_cfg(cfg, "name") == "Godot Mini Game Export",
 		"Plugin name correct")
-	_assert(_extract_cfg(cfg, "version") == "0.3.0",
-		"Plugin version = 0.3.0")
+	_assert(_extract_cfg(cfg, "version") == "0.3.1",
+		"Plugin version = 0.3.1")
 
 
 func _test_p7_no_paywall() -> void:

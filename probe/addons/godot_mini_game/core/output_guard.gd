@@ -22,6 +22,26 @@ const PLATFORM_CONTRACTS := {
 		"api_namespace": "TTMinis.game",
 		"subpackage_field": "subpackages",
 	},
+	"alipay": {
+		"runtime_type": "native",
+		"api_namespace": "my",
+		"subpackage_field": "subpackages",
+	},
+	"baidu": {
+		"runtime_type": "native",
+		"api_namespace": "swan",
+		"subpackage_field": "subpackages",
+	},
+	"qq": {
+		"runtime_type": "native",
+		"api_namespace": "qq",
+		"subpackage_field": "subpackages",
+	},
+	"kuaishou": {
+		"runtime_type": "native",
+		"api_namespace": "ks",
+		"subpackage_field": "subpackages",
+	},
 }
 
 

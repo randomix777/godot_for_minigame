@@ -62,7 +62,7 @@ Godot Mini Game 可以把普通 Godot 项目转换成微信、抖音及实验平
 
 | 契约 | 内置值 |
 |---|---|
-| 插件版本 | `v0.3.0` |
+| 插件版本 | `v0.3.1` |
 | Godot | `4.6.1.stable` · commit `14d19694e0c8` |
 | Emscripten | `4.0.3` |
 | 构建 | `2d_full` · `release` · revision `1` |
@@ -70,13 +70,13 @@ Godot Mini Game 可以把普通 Godot 项目转换成微信、抖音及实验平
 
 - ✅ **微信小游戏（`wx`）**——完整导出、Manifest、WASM 与包结构检查。
 - ✅ **抖音小游戏（`tt`）**——完整导出、Manifest、WASM 与包结构检查，开发者工具和真机验证均已通过。
-- ⛔ **TikTok Mini Game Native（`TTMinis.game`）**——v0.3.0 中禁用。实现代码暂时保留，但 Dock 和导出 API 均不提供该目标。
+- ⛔ **TikTok Mini Game Native（`TTMinis.game`）**——v0.3.1 中禁用。实现代码暂时保留，但 Dock 和导出 API 均不提供该目标。
 
 > [!IMPORTANT]
 > 内置引擎只经过本项目对上述精确身份的验证。其它 Godot 编辑器构建必须导入
 > 完全匹配的模板包。自动化检查不能替代平台开发者工具和目标真机上的最终验收。
 
-v0.3.0 不提供 TikTok 导出；抖音继续使用大小写敏感的 `subPackages`。
+v0.3.1 不提供 TikTok 导出；抖音继续使用大小写敏感的 `subPackages`。
 
 首次运行 TikTok 时，先完成 `ttmg setup` 与 `ttmg login`，进入导出目录后运行
 `ttmg init` 并输入同一个 Client Key，最后运行 `ttmg dev`。固定版 CLI 不会把

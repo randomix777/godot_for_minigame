@@ -12,7 +12,7 @@ MAJOR.MINOR.PATCH[-PRERELEASE]
 - **MINOR**: New features, platforms, or SDK methods (backward compatible)
 - **PATCH**: Bug fixes, documentation, CI improvements
 
-### Current Version: 0.3.0
+### Current Version: 0.3.1
 
 ## Compatibility Contracts
 

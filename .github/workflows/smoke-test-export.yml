@@ -345,7 +345,8 @@ jobs:
         run: |
           set -euo pipefail
           out=/tmp/export_out
-          case "${{ matrix.platform }}" in
+          platform="${{ matrix.platform }}"
+          case "$platform" in
             wechat)
               test -s "$out/project.private.config.json"
               jq -e '
@@ -381,16 +382,34 @@ jobs:
                 exit 1
               fi
               ;;
+            alipay|baidu|qq|kuaishou)
+              # Experimental platforms: validate manifest and game.json contract
+              test -s "$out/.godot-mini-game-export.json"
+              jq -e '
+                has("subpackages") and
+                (.subpackages | type == "array" and length == 2)
+              ' "$out/game.json" >/dev/null
+              jq -e '
+                (.appid | type == "string" and length > 0) and
+                .compileType == "game"
+              ' "$out/project.config.json" >/dev/null
+              # QQ requires private config
+              if [ "$platform" = "qq" ]; then
+                test -s "$out/project.private.config.json"
+              else
+                test ! -e "$out/project.private.config.json" || true
+              fi
+              ;;
             *)
-              echo "Unknown platform contract: ${{ matrix.platform }}" >&2
+              echo "Unknown platform contract: $platform" >&2
               exit 1
               ;;
           esac
           jq -e \
-            --arg platform "${{ matrix.platform }}" \
+            --arg platform "$platform" \
             --arg runtime_type "native" \
-            --arg api_namespace "$(jq -r '.platformContracts["${{ matrix.platform }}"].apiNamespace' support-matrix.json)" \
-            --arg subpackage_field "$(jq -r '.platformContracts["${{ matrix.platform }}"].subpackageField' support-matrix.json)" \
+            --arg api_namespace "$(jq -r ".platformContracts[\"$platform\"].apiNamespace" support-matrix.json)" \
+            --arg subpackage_field "$(jq -r ".platformContracts[\"$platform\"].subpackageField" support-matrix.json)" \
             '
               .platform == $platform and
               .platform_contract.runtime_type == $runtime_type and

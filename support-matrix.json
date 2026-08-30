@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "pluginVersion": "0.3.0",
+  "pluginVersion": "0.3.1",
   "bridgeAbi": 1,
   "templateSchema": 1,
   "outputManifestSchema": 1,
@@ -30,7 +30,7 @@
       "runtimeType": "native",
       "supportTier": "disabled",
       "enabled": false,
-      "disabledInVersion": "0.3.0",
+      "disabledInVersion": "0.3.1",
       "disabledReason": "Deferred until the pinned ttmg compilation and real-device gates can be completed.",
       "apiNamespace": "TTMinis.game",
       "nativeWebAssembly": "TTWebAssembly",

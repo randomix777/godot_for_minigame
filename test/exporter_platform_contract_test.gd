@@ -68,7 +68,7 @@ func _init() -> void:
 	)
 	_assert_true(
 		Array(Exporter.DISABLED_PLATFORMS) == ["tiktok"],
-		"TikTok must remain disabled for v0.3.0",
+		"TikTok must remain disabled for v0.3.1",
 	)
 	var expected_contracts := {
 		"wechat": {"api_namespace": "wx", "subpackage_field": "subpackages"},

@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "generated_at": "2026-08-29T00:00:00Z",
-  "plugin_version": "0.3.0",
+  "plugin_version": "0.3.1",
   "repository": {
     "remote": "https://github.com/AnranS/godot_for_minigame.git",
     "commit": "2b6cb70884e3126cc69075b9c90f53509f25153c",

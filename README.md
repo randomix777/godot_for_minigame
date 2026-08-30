@@ -64,7 +64,7 @@ not a filesystem-wide crash-atomic primitive. Full boundaries are documented in
 
 | Contract | Bundled value |
 |---|---|
-| Plugin release | `v0.3.0` |
+| Plugin release | `v0.3.1` |
 | Godot | `4.6.1.stable` · commit `14d19694e0c8` |
 | Emscripten | `4.0.3` |
 | Build | `2d_full` · `release` · revision `1` |
@@ -72,7 +72,7 @@ not a filesystem-wide crash-atomic primitive. Full boundaries are documented in
 
 - ✅ **WeChat Mini Game (`wx`)** — full export, manifest, WASM, and package checks. DevTools + real device verified.
 - ✅ **Douyin Mini Game (`tt`)** — full export, manifest, WASM, and package checks. DevTools + real device verified.
-- ⛔ **TikTok Mini Game Native (`TTMinis.game`)** — disabled in v0.3.0 pending pinned DevTool and real-device validation. Its implementation is retained for future work but is not exposed by the Dock or exporter.
+- ⛔ **TikTok Mini Game Native (`TTMinis.game`)** — disabled in v0.3.1 pending pinned DevTool and real-device validation. Its implementation is retained for future work but is not exposed by the Dock or exporter.
 - 🔬 **Alipay Mini Game (`my`)** — experimental. Automated export smoke only. Requires Alipay DevTools verification.
 - 🔬 **Baidu Mini Game (`swan`)** — experimental. Automated export smoke only. Requires Baidu DevTools verification.
 - 🔬 **QQ Mini Game (`qq`)** — experimental. Automated export smoke only. Requires QQ DevTools verification.
@@ -84,7 +84,7 @@ not a filesystem-wide crash-atomic primitive. Full boundaries are documented in
 > Automated checks do not replace final testing in platform DevTools and on
 > target devices.
 
-TikTok export is unavailable in v0.3.0. Douyin continues to require the
+TikTok export is unavailable in v0.3.1. Douyin continues to require the
 case-sensitive `subPackages` field.
 
 For the first TikTok run, complete `ttmg setup` and `ttmg login`, enter the

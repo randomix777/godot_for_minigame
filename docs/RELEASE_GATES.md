@@ -1,6 +1,8 @@
 # v0.3.0 Release Gates
 
-## Automated Verification
+> ⚠️ **IMPORTANT**: v0.3.0 was tagged and pushed but remote CI failed. See [Remote CI Failures](#remote-ci-failures-v030) for details. This release should NOT be considered a passing-gate stable release. v0.3.1 fixes these issues.
+
+## Automated Verification (Local)
 
 | Test Suite | Result | Details |
 |-----------|--------|---------|
@@ -9,7 +11,7 @@
 | Godot 4.6.1 smoke tests (13) | ✅ PASS | 13/13 — all test/*_test.gd |
 | Export smoke (6 enabled platforms) | ✅ PASS | wechat, douyin, alipay, baidu, qq, kuaishou |
 | Package reproducibility | ✅ PASS | Identical SHA-256 across runs |
-| Plugin packaging | ✅ PASS | Deterministic ZIP via scripts/package_plugin.mjs |
+| Plugin packaging | ✅ PASS | Deterministic ZIP via scripts/package_plugin.sh |
 | Website build | ✅ PASS | vinext build succeeds |
 | Website tests (3) | ✅ PASS | 3/3 rendered HTML tests |
 | Website lint | ✅ PASS | 0 errors, 15 warnings (img element — acceptable) |
@@ -50,6 +52,44 @@
 | productization_test.gd | ✅ |
 | release_candidate_test.gd | ✅ |
 | version_manager_test.gd | ✅ |
+
+---
+
+## Remote CI Failures (v0.3.0)
+
+The following remote CI failures occurred on the fork repository (`randomix777/godot_for_minigame`):
+
+### 1. Release Plugin / Smoke Test Export — GDScript Test Failure
+
+**Symptom**: `exporter_output_transaction_test.gd` fails on Linux CI for alipay, baidu, qq, kuaishou platforms.
+
+**Root Cause**: `output_guard.gd` `PLATFORM_CONTRACTS` dictionary only contained `wechat`, `douyin`, `tiktok`. The test iterates over all `SUPPORTED_PLATFORMS` (7 platforms) and expects `OutputGuard.inspect()` to succeed for each, but platforms not in `PLATFORM_CONTRACTS` are rejected as "Unknown platform contract".
+
+**Fix**: Added `alipay`, `baidu`, `qq`, `kuaishou` entries to `PLATFORM_CONTRACTS` in `output_guard.gd`. Also added `alipay|baidu|qq|kuaishou` case to the platform contract verification step in `smoke-test-export.yml`.
+
+### 2. Windows CI — Godot Installation Failure
+
+**Symptom**: `mv: cannot move '/tmp/godot/Godot_v4.6.1-stable_win64.exe' to '/usr/local/bin/godot.exe': No such file or directory`
+
+**Root Cause**: On Windows Git Bash, `/tmp` does not resolve to a reliable location. The `unzip` extracts to `/tmp/godot/` but `mv` cannot find the file there. Also, the ZIP contains two files (`Godot_v4.6.1-stable_win64.exe` and `Godot_v4.6.1-stable_win64_console.exe`) and the script assumed a single file name.
+
+**Fix**: Use `$RUNNER_TEMP` instead of `/tmp` for reliable Windows temp paths. Use `find` to locate the correct exe (excluding console variant) instead of hardcoding the filename.
+
+### 3. GitHub Pages — Deployment Failure
+
+**Symptom**: `Error: Failed to create deployment (status: 404)` with message `Ensure GitHub Pages has been enabled: https://github.com/randomix777/godot_for_minigame/settings/pages`
+
+**Root Cause**: GitHub Pages is not enabled in the fork repository settings. The workflow correctly requests `pages: write` and `id-token: write` permissions, but the repository-level Pages setting must be enabled in the GitHub UI.
+
+**Fix Required (Manual)**: Repository owner must enable GitHub Pages in repository Settings → Pages → Source: GitHub Actions.
+
+### 4. Release Asset — Missing Checksum
+
+**Symptom**: v0.3.0 Release only had `godot_mini_game_v0.3.0.zip`, missing `.sha256` file.
+
+**Root Cause**: The `package` job was skipped because `smoke` tests failed (GDScript test failure). The release was created manually or by a different process that didn't run the packaging step.
+
+**Fix**: The release workflow now correctly gates packaging behind smoke test success. The `package` job generates and uploads both `.zip` and `.zip.sha256` files.
 
 ---
 
@@ -114,12 +154,12 @@ target and the exporter rejects direct TikTok export requests. Its previous
 | Item | Status |
 |------|--------|
 | Working tree | ✅ Clean |
-| Current HEAD | `a3b1294` |
-| origin/main | 5 commits behind HEAD |
-| fork/main | ⚠️ 1 commit behind HEAD (awaiting push) |
-| upstream/main | 31 commits ahead of HEAD (unrelated history) |
+| Current HEAD | `ae36e77` (v0.3.0 tag) |
+| origin/main (AnranS/godot_for_minigame) | 6 commits behind HEAD |
+| fork/main (randomix777/godot_for_minigame) | Same as HEAD |
+| upstream/main (godothub/godot-minigame) | Unrelated history |
 
-**Note**: After committing the pending changes, HEAD will be 5 commits ahead of origin/main (AnranS/godot_for_minigame) because this is a fork. The fork (`randomix777/godot_for_minigame`) will be synced after push.
+**Note**: The 6 commits ahead of origin/main represent the v0.3.0 release preparation work.
 
 ---
 
@@ -150,21 +190,21 @@ DevTools and device evidence is recorded.
 
 ## Release Checklist
 
-- [x] All Node.js automated tests pass (12/12)
+- [x] All Node.js automated tests pass (13/13)
 - [x] All Godot automated tests pass (13/13 on 4.6.1)
 - [x] Export smoke test passes (6 enabled platforms)
 - [x] Plugin packages correctly (deterministic ZIP)
 - [x] Version metadata consistent (0.3.0 everywhere)
-- [x] Website build/test/lint pass on Windows
-- [x] **Git working tree clean** — ✅ Completed (a3b1294)
+- [x] Website build/test/lint pass
+- [x] **Git working tree clean** — ✅ Completed (ae36e77)
 - [x] **WeChat DevTools compilation** — ✅ PASSED 2026-08-29
 - [x] **WeChat real device test** — ✅ PASSED 2026-08-29
 - [x] **Douyin DevTools compilation** — ✅ PASSED 2026-08-29
 - [x] **Douyin real device test** — ✅ PASSED 2026-08-29
 - [x] **TikTok export disabled for v0.3.0**
-- [ ] **Remote CI green** — PENDING (after push)
-- [ ] **v0.3.0 tag created** — PENDING
-- [ ] **GitHub Release published** — PENDING
+- [ ] **Remote CI green** — ❌ FAILED (GDScript tests, Windows install, GitHub Pages)
+- [x] **v0.3.0 tag created** — ✅ Created (ae36e77)
+- [ ] **GitHub Release published** — ❌ INCOMPLETE (missing .sha256 asset)
 
 ---
 
@@ -175,3 +215,19 @@ DevTools and device evidence is recorded.
 - Do NOT mark Godot 4.7.1 as certified (template asset not available)
 - Do NOT mark experimental platforms (alipay/baidu/qq/kuaishou) as certified without DevTools verification
 - Do NOT re-enable TikTok without pinned DevTool compilation and real-device evidence
+- Do NOT modify or delete the v0.3.0 tag
+- Do NOT overwrite the existing v0.3.0 GitHub Release assets
+
+---
+
+## Required Manual Actions (GitHub UI)
+
+1. **Enable GitHub Pages** on the fork repository:
+   - Go to `https://github.com/randomix777/godot_for_minigame/settings/pages`
+   - Set Source to "GitHub Actions"
+   - This is required for the Deploy Website workflow to succeed
+
+2. **Repository Actions Permissions** (if not already set):
+   - Go to `https://github.com/randomix777/godot_for_minigame/settings/actions`
+   - Ensure "Read and write permissions" is selected under "Workflow permissions"
+   - Ensure "Allow GitHub Actions to create and approve pull requests" is checked

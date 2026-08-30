@@ -38,7 +38,7 @@ assert.equal(douyinContract.subpackageField, "subPackages");
 assert.equal(tiktokContract.runtimeType, "native");
 assert.equal(tiktokContract.supportTier, "disabled");
 assert.equal(tiktokContract.enabled, false);
-assert.equal(tiktokContract.disabledInVersion, "0.3.0");
+assert.equal(tiktokContract.disabledInVersion, "0.3.1");
 assert.equal(tiktokContract.apiNamespace, "TTMinis.game");
 assert.equal(tiktokContract.subpackageField, "subpackages");
 assert.equal(tiktokContract.devtool, "ttmg");

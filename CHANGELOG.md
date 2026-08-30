@@ -10,6 +10,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - None
 
+## [0.3.1] - 2026-08-30
+
+### Fixed
+- **GDScript test failure**: Added missing platform contracts (alipay, baidu, qq, kuaishou) to `output_guard.gd` PLATFORM_CONTRACTS dictionary, fixing "Unknown platform contract" errors in CI GDScript tests
+- **Windows Godot installation**: Fixed unreliable `/tmp` path usage on Windows; now uses `$RUNNER_TEMP` and finds executable via `find` to handle ZIP file naming variations
+- **Smoke test export**: Extended platform contract verification to handle alipay, baidu, qq, and kuaishou experimental platforms with appropriate assertions
+- **Release workflow**: Updated release body to reflect all supported platforms including TikTok disabled notice
+- **GitHub Pages**: Documented required repository settings configuration (Pages must be enabled in Settings → Pages)
+
 ## [0.3.0] - 2026-08-29
 
 ### Added
@@ -38,10 +47,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - All template JS files converted from ES module to CommonJS (WeChat/Douyin/TikTok/Alipay/Baidu/QQ/Kuaishou DevTools compatibility)
 
 ### Changed
-- Plugin version bumped to 0.3.0
+- Plugin version bumped to 0.3.1
 - Support matrix expanded with Godot 4.7.1 planned entry (template asset not yet available)
 - Platform detection now supports 7 platforms: WeChat, Douyin, TikTok, Alipay, Baidu, QQ, Kuaishou
 - Export smoke tests now cover all 7 platforms
+- Description updated to include all supported platforms
 
 ## [0.2.1]
 

@@ -117,7 +117,7 @@ for (const readme of [english, chinese]) {
   assert.match(readme, /`tt`/);
   assert.match(readme, /`TTMinis\.game`/);
   assert.match(readme, /TikTok Mini Game Native/);
-  assert.match(readme, /(?:disabled in v0\.3\.0|v0\.3\.0 中禁用)/);
+  assert.match(readme, /(?:disabled in v0\.3\.1|v0\.3\.1 中禁用)/);
   assert.match(readme, /`subPackages`/);
   assert.doesNotMatch(readme, /Full API Reference|完整 API 参考|Real-device ready|ready for submission|all \d+ methods (?:are )?supported/);
 }

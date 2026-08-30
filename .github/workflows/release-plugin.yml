@@ -71,8 +71,9 @@ jobs:
             ## Godot Mini Game Plugin v${{ steps.version.outputs.version }}
 
             - Transactional mini-game export with version-locked engine templates.
-            - WeChat, Douyin, and TikTok platform runtimes with a shared bridge ABI.
+            - WeChat, Douyin, Alipay, Baidu, QQ, and Kuaishou platform runtimes with a shared bridge ABI.
             - Bundled certified engine template for the exact version listed in `support-matrix.json`.
+            - TikTok support deferred to a future release.
 
             Download the installable ZIP below and extract it into the root of a Godot project.
           files: |

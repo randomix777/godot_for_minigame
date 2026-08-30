@@ -155,10 +155,19 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          GODOT_INSTALL_DIR="$RUNNER_TEMP/godot"
+          mkdir -p "$GODOT_INSTALL_DIR"
           url="https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}/Godot_v${GODOT_VERSION}_win64.exe.zip"
-          curl -fsSL -o /tmp/godot.zip "$url"
-          unzip -q /tmp/godot.zip -d /tmp/godot
-          mv "/tmp/godot/Godot_v${GODOT_VERSION}_win64.exe" /usr/local/bin/godot.exe
+          curl -fsSL -o "$RUNNER_TEMP/godot.zip" "$url"
+          unzip -q "$RUNNER_TEMP/godot.zip" -d "$GODOT_INSTALL_DIR"
+          # Find the main exe (not console variant) and copy to PATH
+          main_exe="$(find "$GODOT_INSTALL_DIR" -name '*win64.exe' ! -name '*console*' | head -1)"
+          if [ -z "$main_exe" ]; then
+            echo "Could not find Godot executable in extracted ZIP" >&2
+            ls -la "$GODOT_INSTALL_DIR"
+            exit 1
+          fi
+          cp "$main_exe" /usr/local/bin/godot.exe
           godot.exe --version
 
       - name: Create Web export preset
@@ -233,10 +242,19 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          url="https://github.com/godotengine/godot/releases/download/4.6.1-stable/Godot_v4.6.1-stable_win64.exe.zip"
-          curl -fsSL -o /tmp/godot.zip "$url"
-          unzip -q /tmp/godot.zip -d /tmp/godot
-          mv "/tmp/godot/Godot_v4.6.1-stable_win64.exe" /usr/local/bin/godot.exe
+          GODOT_VERSION="4.6.1-stable"
+          GODOT_INSTALL_DIR="$RUNNER_TEMP/godot"
+          mkdir -p "$GODOT_INSTALL_DIR"
+          url="https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}/Godot_v${GODOT_VERSION}_win64.exe.zip"
+          curl -fsSL -o "$RUNNER_TEMP/godot.zip" "$url"
+          unzip -q "$RUNNER_TEMP/godot.zip" -d "$GODOT_INSTALL_DIR"
+          main_exe="$(find "$GODOT_INSTALL_DIR" -name '*win64.exe' ! -name '*console*' | head -1)"
+          if [ -z "$main_exe" ]; then
+            echo "Could not find Godot executable in extracted ZIP" >&2
+            ls -la "$GODOT_INSTALL_DIR"
+            exit 1
+          fi
+          cp "$main_exe" /usr/local/bin/godot.exe
           godot.exe --version
 
       - name: Create Web export preset
