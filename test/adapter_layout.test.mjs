@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
+import vm from "node:vm";
 
 const projectRoot = path.resolve(import.meta.dirname, "..");
 const adapterPath = path.join(projectRoot, "addons/godot_mini_game/templates/common/adapter.js");
@@ -83,6 +84,14 @@ function installMiniGameGlobals(platform = "wechat", options = {}) {
   } else if (platform === "tiktok") {
     if (options.gameGlobalProvider) globalThis.GameGlobal.TTMinis = { game: api };
     else globalThis.TTMinis = { game: api };
+  } else if (platform === "alipay") {
+    globalThis.my = api;
+  } else if (platform === "baidu") {
+    globalThis.swan = api;
+  } else if (platform === "qq") {
+    globalThis.qq = api;
+  } else if (platform === "kuaishou") {
+    globalThis.ks = api;
   } else {
     globalThis.wx = api;
   }
@@ -95,10 +104,10 @@ function installMiniGameGlobals(platform = "wechat", options = {}) {
 }
 
 async function loadAdapter() {
-  const runtimeUrl = moduleUrl(fs.readFileSync(runtimePath, "utf8"));
-  const source = fs.readFileSync(adapterPath, "utf8")
-    .replace('"./js/platform_runtime"', JSON.stringify(runtimeUrl));
-  await import(moduleUrl(source));
+  // Execute platform_runtime first to set globals (wrapped in IIFE to isolate const/let)
+  vm.runInThisContext(`(function(){${fs.readFileSync(runtimePath, "utf8")}})()`, { filename: "platform_runtime.js" });
+  // Then execute adapter (reads PlatformRuntime from globals)
+  vm.runInThisContext(`(function(){${fs.readFileSync(adapterPath, "utf8")}})()`, { filename: "adapter.js" });
 }
 
 async function testCanvasSeparatesLogicalMetricsFromPhysicalBacking(platform) {
@@ -365,7 +374,7 @@ async function testTiktokWebAssemblyShimCoversRuntimeRealms() {
   }
 }
 
-for (const platform of ["wechat", "douyin", "tiktok"]) {
+for (const platform of ["wechat", "douyin", "tiktok", "alipay", "baidu", "qq", "kuaishou"]) {
   await testCanvasSeparatesLogicalMetricsFromPhysicalBacking(platform);
   await testResizeKeepsMetricsInTheSameCoordinateSpace(platform);
   await testTouchCoordinatesStayInCssPixels(platform);

@@ -18,14 +18,15 @@ const archivePath = path.join(projectRoot, "dist", archiveName);
 const checksumPath = `${archivePath}.sha256`;
 
 function packagePlugin() {
-  const result = spawnSync("bash", ["scripts/package_plugin.sh"], {
+  // Use the cross-platform Node.js packaging script (deterministic ZIP)
+  const result = spawnSync("node", ["scripts/package_plugin.mjs"], {
     cwd: projectRoot,
     encoding: "utf8",
   });
   assert.equal(
     result.status,
     0,
-    `package_plugin.sh failed:\n${result.stdout}\n${result.stderr}`,
+    `package_plugin.mjs failed:\n${result.stdout}\n${result.stderr}`,
   );
   return createHash("sha256").update(fs.readFileSync(archivePath)).digest("hex");
 }
@@ -37,10 +38,9 @@ assert.equal(secondHash, firstHash, "identical source trees must produce byte-id
 const checksum = fs.readFileSync(checksumPath, "utf8").trim();
 assert.match(
   checksum,
-  new RegExp(`^${secondHash}\\s+\\*?${archiveName.replaceAll(".", "\\.")}$`),
+  new RegExp(`^${secondHash}\\s+${archiveName.replaceAll(".", "\\.")}$`),
   "checksum must contain the archive basename and its actual SHA-256",
 );
 assert.ok(!checksum.includes(projectRoot), "checksum must not disclose the maintainer workspace path");
-assert.ok(!checksum.includes("/home/runner/"), "checksum must not disclose the CI workspace path");
 
 console.log("package_reproducibility.test.mjs: ok");

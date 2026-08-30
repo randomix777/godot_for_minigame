@@ -145,10 +145,10 @@ assertSafePng(architectureEnglish, "assets/export-architecture.png", { width: 14
 assertSafePng(architectureEnglishMobile, "assets/export-architecture-mobile.png", { width: 720, height: 1280 }, 2, 950_000);
 assertSafePng(architectureChinese, "assets/export-architecture-zh.png", { width: 1440, height: 960 }, 2, 1_350_000);
 assertSafePng(architectureChineseMobile, "assets/export-architecture-zh-mobile.png", { width: 720, height: 1280 }, 2, 950_000);
-assert.match(english, /each transaction selects WeChat, Douyin, or TikTok Native/);
+assert.match(english, /each transaction selects one of 7 platforms/);
 assert.match(english, /game\.js` selects exactly one `PlatformRuntime` provider/);
 assert.match(english, /not a filesystem-wide crash-atomic primitive/);
-assert.match(chinese, /每次事务只选择微信、抖音或 TikTok Native 之一/);
+assert.match(chinese, /每次事务从7个平台/);
 assert.match(chinese, /game\.js` 只选择一个 `PlatformRuntime` Provider/);
 assert.match(chinese, /不是跨文件系统的 crash-atomic/);
 assert.match(english, new RegExp(`${methods.length} methods and ${signals.length} signals`));

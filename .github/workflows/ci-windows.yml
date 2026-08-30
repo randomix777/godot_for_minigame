@@ -1,0 +1,360 @@
+name: Windows CI
+
+on:
+  pull_request:
+    paths:
+      - "addons/godot_mini_game/**"
+      - "test/**"
+      - "support-matrix.json"
+      - ".github/workflows/ci-windows.yml"
+  push:
+    branches: [main]
+  workflow_call: {}
+  workflow_dispatch: {}
+
+jobs:
+  # ─── Static Checks ─────────────────────────────────────────────
+  static:
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate support-matrix.json schema
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Required top-level fields
+          jq -e '
+            (.schema | type == "number" and . > 0) and
+            (.pluginVersion | type == "string" and length > 0) and
+            (.bridgeAbi | type == "number" and . > 0) and
+            (.templateSchema | type == "number" and . > 0) and
+            (.outputManifestSchema | type == "number" and . > 0) and
+            (.requiresExactEngineTemplate == true) and
+            (.platformContracts | type == "object") and
+            (.certified | type == "array" and length > 0)
+          ' support-matrix.json
+
+          # Every certified entry must have required fields
+          jq -e '
+            all(.certified[];
+              (.godotVersion | type == "string") and
+              (.godotTag | type == "string") and
+              (.godotCommit | type == "string" and length == 40) and
+              (.emscriptenVersion | type == "string") and
+              (.profile | type == "string") and
+              (.target | type == "string") and
+              (.templateRevision | type == "number" and . > 0) and
+              (.template | type == "object") and
+              (.platforms | type == "object")
+            )
+          ' support-matrix.json
+
+          # pluginVersion must match plugin.cfg
+          cfg_version=$(grep 'version=' addons/godot_mini_game/plugin.cfg | head -1 | cut -d'"' -f2)
+          matrix_version=$(jq -r '.pluginVersion' support-matrix.json)
+          if [ "$cfg_version" != "$matrix_version" ]; then
+            echo "Version mismatch: plugin.cfg=$cfg_version support-matrix.json=$matrix_version" >&2
+            exit 1
+          fi
+          echo "✓ support-matrix.json schema valid, version=$matrix_version"
+
+      - name: Validate template.json schema
+        shell: bash
+        run: |
+          set -euo pipefail
+          TEMPLATE="addons/godot_mini_game/engine/template.json"
+          jq -e '
+            (.schema | type == "number" and . > 0) and
+            (.godot.version | type == "string" and test("^[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9A-Za-z]+$")) and
+            (.godot.commit | type == "string" and test("^[0-9a-fA-F]{40}$")) and
+            (.emscriptenVersion | type == "string") and
+            (.profile | type == "string") and
+            (.target | type == "string") and
+            (.revision | type == "number" and . > 0) and
+            (.bridgeAbi | type == "number" and . > 0) and
+            (.features | type == "object") and
+            (.artifacts | type == "object") and
+            (.artifacts["godot.js"].sha256 | type == "string" and test("^[0-9a-fA-F]{64}$")) and
+            (.artifacts["godot.wasm.br"].sha256 | type == "string" and test("^[0-9a-fA-F]{64}$"))
+          ' "$TEMPLATE"
+          echo "✓ template.json schema valid"
+
+      - name: Verify template artifact hashes
+        shell: bash
+        run: |
+          set -euo pipefail
+          TEMPLATE="addons/godot_mini_game/engine/template.json"
+          ENGINE_DIR="addons/godot_mini_game/engine"
+
+          for artifact in godot.js godot.wasm.br; do
+            expected=$(jq -r --arg a "$artifact" '.artifacts[$a].sha256' "$TEMPLATE")
+            actual=$(sha256sum "${ENGINE_DIR}/${artifact}" | cut -d' ' -f1)
+            if [ "$expected" != "$actual" ]; then
+              echo "HASH MISMATCH: $artifact" >&2
+              echo "  expected: $expected" >&2
+              echo "  actual:   $actual" >&2
+              exit 1
+            fi
+            echo "✓ $artifact hash matches"
+          done
+
+      - name: Verify .gitattributes prevents CRLF
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! grep -q "godot\.js" .gitattributes 2>/dev/null; then
+            echo "WARNING: .gitattributes does not protect godot.js from CRLF" >&2
+            exit 1
+          fi
+          echo "✓ .gitattributes present"
+
+      - name: Check required documentation
+        shell: bash
+        run: |
+          set -euo pipefail
+          for doc in LICENSE README.md CHANGELOG.md SECURITY.md CONTRIBUTING.md VERSION_SUPPORT.md; do
+            if [ ! -f "$doc" ]; then
+              echo "Missing required document: $doc" >&2
+              exit 1
+            fi
+            echo "✓ $doc present"
+          done
+
+      - name: Verify plugin.cfg consistency
+        shell: bash
+        run: |
+          set -euo pipefail
+          # plugin.cfg version must match support-matrix.json
+          cfg_version=$(grep 'version=' addons/godot_mini_game/plugin.cfg | head -1 | cut -d'"' -f2)
+          matrix_version=$(jq -r '.pluginVersion' support-matrix.json)
+          if [ "$cfg_version" != "$matrix_version" ]; then
+            echo "Version mismatch" >&2
+            exit 1
+          fi
+          # plugin.cfg entry script must exist
+          entry=$(grep 'script=' addons/godot_mini_game/plugin.cfg | head -1 | cut -d'"' -f2)
+          if [ ! -f "addons/godot_mini_game/$entry" ]; then
+            echo "Entry script missing: $entry" >&2
+            exit 1
+          fi
+          echo "✓ plugin.cfg valid (v$cfg_version, entry=$entry)"
+
+  # ─── GDScript Tests (Windows) ──────────────────────────────────
+  unit:
+    needs: static
+    runs-on: windows-latest
+    timeout-minutes: 20
+    env:
+      GODOT_VERSION: 4.6.1-stable
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Godot
+        shell: bash
+        run: |
+          set -euo pipefail
+          url="https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}/Godot_v${GODOT_VERSION}_win64.exe.zip"
+          curl -fsSL -o /tmp/godot.zip "$url"
+          unzip -q /tmp/godot.zip -d /tmp/godot
+          mv "/tmp/godot/Godot_v${GODOT_VERSION}_win64.exe" /usr/local/bin/godot.exe
+          godot.exe --version
+
+      - name: Create Web export preset
+        shell: bash
+        run: |
+          cat > export_presets.cfg <<'EOF'
+          [preset.0]
+          name="Web"
+          platform="Web"
+          runnable=true
+          dedicated_server=false
+          custom_features=""
+          export_filter="all_resources"
+          include_filter=""
+          exclude_filter=""
+          export_path=""
+          encryption_include_filters=""
+          encryption_exclude_filters=""
+          encrypt_pck=false
+          encrypt_directory=false
+          script_export_mode=2
+
+          [preset.0.options]
+          custom_template/debug=""
+          custom_template/release=""
+          variant/extensions_support=false
+          vram_texture_compression/for_desktop=true
+          vram_texture_compression/for_mobile=false
+          html/export_icon=true
+          html/custom_html_shell=""
+          html/head_include=""
+          html/canvas_resize_policy=2
+          html/focus_canvas_on_start=true
+          html/experimental_virtual_keyboard=false
+          progressive_web_app/enabled=false
+          EOF
+
+      - name: Import project
+        run: godot.exe --headless --import --quit
+
+      - name: Run JavaScript tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          for test_file in test/*.test.mjs; do
+            echo "Running $test_file..."
+            node "$test_file"
+          done
+
+      - name: Run GDScript tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          for test_file in test/*_test.gd; do
+            echo "Running $test_file..."
+            godot.exe --headless --path . --script "res://${test_file}"
+          done
+
+  # ─── Export Tests (Windows) ────────────────────────────────────
+  export:
+    needs: unit
+    runs-on: windows-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [wechat, douyin]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Godot
+        shell: bash
+        run: |
+          set -euo pipefail
+          url="https://github.com/godotengine/godot/releases/download/4.6.1-stable/Godot_v4.6.1-stable_win64.exe.zip"
+          curl -fsSL -o /tmp/godot.zip "$url"
+          unzip -q /tmp/godot.zip -d /tmp/godot
+          mv "/tmp/godot/Godot_v4.6.1-stable_win64.exe" /usr/local/bin/godot.exe
+          godot.exe --version
+
+      - name: Create Web export preset
+        shell: bash
+        run: |
+          cat > export_presets.cfg <<'EOF'
+          [preset.0]
+          name="Web"
+          platform="Web"
+          runnable=true
+          dedicated_server=false
+          custom_features=""
+          export_filter="all_resources"
+          include_filter=""
+          exclude_filter=""
+          export_path=""
+          encryption_include_filters=""
+          encryption_exclude_filters=""
+          encrypt_pck=false
+          encrypt_directory=false
+          script_export_mode=2
+
+          [preset.0.options]
+          custom_template/debug=""
+          custom_template.release=""
+          variant/extensions_support=false
+          vram_texture_compression/for_desktop=true
+          vram_texture_compression/for_mobile=false
+          html/export_icon=true
+          html/custom_html_shell=""
+          html/head_include=""
+          html/canvas_resize_policy=2
+          html/focus_canvas_on_start=true
+          html/experimental_virtual_keyboard=false
+          progressive_web_app/enabled=false
+          EOF
+
+      - name: Import project
+        run: godot.exe --headless --import --quit
+
+      - name: Export to ${{ matrix.platform }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/export_out
+          cat > /tmp/export_script.gd <<GDSCRIPT
+          extends SceneTree
+          func _init() -> void:
+              var Exporter = load("res://addons/godot_mini_game/exporter.gd")
+              var exporter = Exporter.new()
+              exporter.log_callback = func(msg: String) -> void: print("[EXP] ", msg)
+              var appid = "${{ matrix.platform == 'wechat' && 'wxtest123456' || 'tttest123456' }}"
+              var err = await exporter.export_mini_game(
+                  "${{ matrix.platform }}",
+                  appid,
+                  "portrait",
+                  "Web",
+                  "/tmp/export_out/${{ matrix.platform }}"
+              )
+              print("RESULT:", err)
+              quit(0 if err == OK else 1)
+          GDSCRIPT
+          cp /tmp/export_script.gd repro_output/run_export_ci.gd 2>/dev/null || true
+          mkdir -p repro_output
+          cp /tmp/export_script.gd repro_output/run_export_ci.gd
+          godot.exe --headless --path . --script "res://repro_output/run_export_ci.gd"
+
+      - name: Validate export output
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUTPUT="/tmp/export_out/${{ matrix.platform }}"
+
+          # Check export manifest
+          test -f "$OUTPUT/.godot-mini-game-export.json"
+          platform_actual=$(jq -r '.platform' "$OUTPUT/.godot-mini-game-export.json")
+          test "$platform_actual" = "${{ matrix.platform }}"
+
+          # Check required files exist and are non-empty
+          for file in adapter.js fetch.js game.js game.json project.config.json \
+                     engine/godot.wasm.br engine/godot.zip \
+                     js/libs/godot.js js/libs/sdk.js js/loader.js js/platform_runtime.js; do
+            test -s "$OUTPUT/$file" || { echo "MISSING or empty: $file" >&2; exit 1; }
+          done
+
+          # Platform-specific checks
+          if [ "${{ matrix.platform }}" = "wechat" ]; then
+            test -f "$OUTPUT/project.private.config.json"
+            jq -e '.subpackages | length > 0' "$OUTPUT/game.json"
+          elif [ "${{ matrix.platform }}" = "douyin" ]; then
+            test ! -f "$OUTPUT/project.private.config.json"
+            jq -e '.subPackages | length > 0' "$OUTPUT/game.json"
+          fi
+
+          echo "✓ ${{ matrix.platform }} export validation passed"
+
+      - name: Verify WASM is valid WebAssembly
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUTPUT="/tmp/export_out/${{ matrix.platform }}"
+          wasm_br="$OUTPUT/engine/godot.wasm.br"
+
+          # Check Brotli magic bytes
+          first_bytes=$(xxd -p -l 4 "$wasm_br")
+          test "$first_bytes" = "cfff ff7f" || { echo "Not valid Brotli" >&2; exit 1; }
+
+          # Decompress and verify WASM magic
+          brotli --decompress --force --output=/tmp/godot.wasm "$wasm_br"
+          wasm_magic=$(xxd -p -l 4 /tmp/godot.wasm)
+          test "$wasm_magic" = "0061736d" || { echo "Not valid WASM" >&2; exit 1; }
+
+          echo "✓ WASM validated"
+
+      - name: Upload export artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: export-windows-${{ matrix.platform }}
+          path: /tmp/export_out/${{ matrix.platform }}
+          retention-days: 7

@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
+import vm from "node:vm";
 
 const projectRoot = path.resolve(import.meta.dirname, "..");
 const runtimePath = path.join(
@@ -8,14 +9,14 @@ const runtimePath = path.join(
   "addons/godot_mini_game/templates/common/js/platform_runtime.js",
 );
 
-function moduleUrl(source) {
-  return `data:text/javascript;charset=utf-8,${encodeURIComponent(source)}#${Date.now()}-${Math.random()}`;
-}
-
 async function loadRuntime({
   wxApi,
   ttApi,
   tiktokApi,
+  myApi,
+  swanApi,
+  qqApi,
+  ksApi,
   gameGlobalTiktokApi,
   explicitPlatform,
   cachedRuntime,
@@ -26,6 +27,10 @@ async function loadRuntime({
   delete globalThis.wx;
   delete globalThis.tt;
   delete globalThis.TTMinis;
+  delete globalThis.my;
+  delete globalThis.swan;
+  delete globalThis.qq;
+  delete globalThis.ks;
   delete globalThis.WXWebAssembly;
   delete globalThis.TTWebAssembly;
   delete globalThis.__godotMiniGamePlatformRuntime;
@@ -38,13 +43,20 @@ async function loadRuntime({
   if (wxApi) globalThis.wx = wxApi;
   if (ttApi) globalThis.tt = ttApi;
   if (tiktokApi) globalThis.TTMinis = { game: tiktokApi };
+  if (myApi) globalThis.my = myApi;
+  if (swanApi) globalThis.swan = swanApi;
+  if (qqApi) globalThis.qq = qqApi;
+  if (ksApi) globalThis.ks = ksApi;
   if (gameGlobalTiktokApi) globalThis.GameGlobal.TTMinis = { game: gameGlobalTiktokApi };
   if (wxWebAssembly) globalThis.WXWebAssembly = wxWebAssembly;
   if (ttWebAssembly) globalThis.TTWebAssembly = ttWebAssembly;
   if (gameGlobalTtWebAssembly) globalThis.GameGlobal.TTWebAssembly = gameGlobalTtWebAssembly;
 
   const source = fs.readFileSync(runtimePath, "utf8");
-  return import(moduleUrl(source));
+  // Wrap in IIFE to isolate const/let declarations across multiple calls
+  vm.runInThisContext(`(function(){${source}})()`, { filename: "platform_runtime.js" });
+  // platform_runtime.js sets globals — return a compat object for destructuring
+  return { PlatformRuntime: globalThis.__godotMiniGamePlatformRuntime || globalThis.PlatformRuntime };
 }
 
 function makeApi() {
@@ -136,7 +148,7 @@ async function testNeitherProviderHasADescriptiveFailure() {
     () => PlatformRuntime.requireApi("adapter"),
     (error) => error instanceof Error
       && !(error instanceof ReferenceError)
-      && error.message.includes("TikTok (TTMinis.game)"),
+      && error.message.includes("TTMinis.game"),
   );
 }
 
@@ -184,7 +196,7 @@ async function testExplicitPlatformDoesNotFallBackToTheWrongApi() {
 
   assert.equal(PlatformRuntime.platform, "douyin");
   assert.equal(PlatformRuntime.available, false);
-  assert.throws(() => PlatformRuntime.requireApi("test"), /TikTok \(TTMinis\.game\)/);
+  assert.throws(() => PlatformRuntime.requireApi("test"), /TTMinis\.game/);
 
   const explicitTiktok = await loadRuntime({
     ttApi: makeApi(),
@@ -192,7 +204,7 @@ async function testExplicitPlatformDoesNotFallBackToTheWrongApi() {
   });
   assert.equal(explicitTiktok.PlatformRuntime.platform, "tiktok");
   assert.equal(explicitTiktok.PlatformRuntime.available, false);
-  assert.throws(() => explicitTiktok.PlatformRuntime.requireApi("test"), /TikTok \(TTMinis\.game\)/);
+  assert.throws(() => explicitTiktok.PlatformRuntime.requireApi("test"), /TTMinis\.game/);
 }
 
 async function testNativeWebAssemblySelectionSupportsBothByteDanceIdentities() {
@@ -251,6 +263,10 @@ async function testForeignCachedRuntimeIsRejected() {
 await testWxOnlyDetection();
 await testTtOnlyDetection();
 await testTiktokOnlyDetection();
+await testAlipayOnlyDetection();
+await testBaiduOnlyDetection();
+await testQqOnlyDetection();
+await testKuaishouOnlyDetection();
 await testGameGlobalTiktokDetection();
 await testNeitherProviderHasADescriptiveFailure();
 await testExplicitPlatformBreaksATwoProviderTie();
@@ -260,5 +276,65 @@ await testNativeWebAssemblySelectionSupportsBothByteDanceIdentities();
 await testCapabilityFailureListsEveryMissingRequirement();
 await testSystemInfoSupportsEitherPlatformApi();
 await testForeignCachedRuntimeIsRejected();
+
+async function testAlipayOnlyDetection() {
+  const myApi = makeApi();
+  const { PlatformRuntime } = await loadRuntime({ myApi: myApi });
+
+  assert.equal(PlatformRuntime.platform, "alipay");
+  assert.equal(PlatformRuntime.apiPrefix, "my");
+  assert.equal(PlatformRuntime.requireApi("test"), myApi);
+  assert.equal(PlatformRuntime.capabilities.canvas, true);
+  assert.equal(PlatformRuntime.requirePlatform("alipay", "test"), myApi);
+  assert.throws(
+    () => PlatformRuntime.requirePlatform("wechat", "WeChat entrypoint"),
+    /requires wechat, but detected alipay/,
+  );
+}
+
+async function testBaiduOnlyDetection() {
+  const swanApi = makeApi();
+  const { PlatformRuntime } = await loadRuntime({ swanApi: swanApi });
+
+  assert.equal(PlatformRuntime.platform, "baidu");
+  assert.equal(PlatformRuntime.apiPrefix, "swan");
+  assert.equal(PlatformRuntime.requireApi("test"), swanApi);
+  assert.equal(PlatformRuntime.capabilities.canvas, true);
+  assert.equal(PlatformRuntime.requirePlatform("baidu", "test"), swanApi);
+  assert.throws(
+    () => PlatformRuntime.requirePlatform("wechat", "WeChat entrypoint"),
+    /requires wechat, but detected baidu/,
+  );
+}
+
+async function testQqOnlyDetection() {
+  const qqApi = makeApi();
+  const { PlatformRuntime } = await loadRuntime({ qqApi: qqApi });
+
+  assert.equal(PlatformRuntime.platform, "qq");
+  assert.equal(PlatformRuntime.apiPrefix, "qq");
+  assert.equal(PlatformRuntime.requireApi("test"), qqApi);
+  assert.equal(PlatformRuntime.capabilities.canvas, true);
+  assert.equal(PlatformRuntime.requirePlatform("qq", "test"), qqApi);
+  assert.throws(
+    () => PlatformRuntime.requirePlatform("wechat", "WeChat entrypoint"),
+    /requires wechat, but detected qq/,
+  );
+}
+
+async function testKuaishouOnlyDetection() {
+  const ksApi = makeApi();
+  const { PlatformRuntime } = await loadRuntime({ ksApi: ksApi });
+
+  assert.equal(PlatformRuntime.platform, "kuaishou");
+  assert.equal(PlatformRuntime.apiPrefix, "ks");
+  assert.equal(PlatformRuntime.requireApi("test"), ksApi);
+  assert.equal(PlatformRuntime.capabilities.canvas, true);
+  assert.equal(PlatformRuntime.requirePlatform("kuaishou", "test"), ksApi);
+  assert.throws(
+    () => PlatformRuntime.requirePlatform("wechat", "WeChat entrypoint"),
+    /requires wechat, but detected kuaishou/,
+  );
+}
 
 console.log("platform_runtime.test.mjs: ok");

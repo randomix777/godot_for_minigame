@@ -52,7 +52,7 @@ Godot Mini Game 可以把普通 Godot 项目转换成微信、抖音或 TikTok �
 
 <p align="center"><sub>点击架构图可查看原始尺寸。</sub></p>
 
-- **导出控制面**——每次事务只选择微信、抖音或 TikTok Native 之一，解析一个完整引擎模板包，在目标目录之外装配，验证所有受管产物，再在锁内发布。
+- **导出控制面**——每次事务从7个平台（微信、抖音、TikTok、支付宝、百度、QQ、快手）中选择一个，解析一个完整引擎模板包，在目标目录之外装配，验证所有受管产物，再在锁内发布。
 - **导出产物运行时**——`game.js` 只选择一个 `PlatformRuntime` Provider；Loader 启动修补后的引擎与 PCK，`GodotSDK` 和 `MiniGameSDK` 协商 Bridge ABI。
 
 发布过程支持进程内失败回滚并记录恢复证据，但它不是跨文件系统的 crash-atomic

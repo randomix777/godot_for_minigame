@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
+import vm from "node:vm";
 
 const projectRoot = path.resolve(import.meta.dirname, "..");
 const commonRoot = path.join(projectRoot, "addons/godot_mini_game/templates/common");
@@ -104,6 +105,7 @@ async function loadLoaderFixture(platform = "wechat") {
   delete globalThis.PlatformRuntime;
   delete globalThis.godotSdk;
   delete globalThis.godotMiniGameBridgeV1;
+  delete globalThis.__GodotLoader;
 
   const renderDpr = platform === "tiktok" ? 3 : 1;
   const gl = makeWebGl(390 * renderDpr, 844 * renderDpr);
@@ -228,23 +230,34 @@ async function loadLoaderFixture(platform = "wechat") {
     globalThis.GameGlobal.TTMinis = { game: hostApi };
   }
 
-  const runtimeUrl = moduleUrl(read("js/platform_runtime.js"));
-  const sdkUrl = moduleUrl(
-    replaceSpecifier(read("js/libs/sdk.js"), "../platform_runtime", runtimeUrl),
-  );
-  const godotStubUrl = moduleUrl("export {};");
-  const imageLoaderStubUrl = moduleUrl(
-    "export function waitForImage() { return Promise.resolve(); }",
-  );
-  let loaderSource = read("js/loader.js");
-  loaderSource = replaceSpecifier(loaderSource, "./libs/godot", godotStubUrl);
-  loaderSource = replaceSpecifier(loaderSource, "./libs/sdk", sdkUrl);
-  loaderSource = replaceSpecifier(loaderSource, "./image_loader", imageLoaderStubUrl);
-  loaderSource = replaceSpecifier(loaderSource, "./platform_runtime", runtimeUrl);
-  const loaderModule = await import(moduleUrl(loaderSource));
+  const runtimeSource = read("js/platform_runtime.js");
+  const sdkSource = read("js/libs/sdk.js");
+  const loaderSource = read("js/loader.js");
+
+  // Execute platform_runtime.js (sets PlatformRuntime global)
+  vm.runInThisContext(`(function(){${runtimeSource}})()`, { filename: "platform_runtime.js" });
+  // Execute sdk.js (reads PlatformRuntime, sets godotSdk)
+  vm.runInThisContext(`(function(){${sdkSource}})()`, { filename: "sdk.js" });
+
+  // Set up stubs for image_loader and godot
+  globalThis.GameGlobal.__waitForImage = () => Promise.resolve();
+
+  // Provide mock require for loader.js dependencies
+  globalThis.require = (id) => {
+    if (id === "./platform_runtime") { /* already loaded */ }
+    else if (id === "./libs/sdk") { /* already loaded */ }
+    else if (id === "./libs/godot") { /* WASM shim — not needed for tests */ }
+    else if (id === "./image_loader") { /* already set globally */ }
+  };
+
+  try {
+    vm.runInThisContext(`(function(){${loaderSource}})()`, { filename: "loader.js" });
+  } finally {
+    delete globalThis.require;
+  }
 
   return {
-    Loader: loaderModule.default,
+    Loader: globalThis.GameGlobal?.__GodotLoader || globalThis.__GodotLoader,
     adapterWindow,
     clearedTimers,
     engineCalls,
@@ -314,7 +327,7 @@ async function testLegacyCanvasSingleLoadAndDispose() {
   assert.equal(engine.config.canvas, fixture.mainCanvas);
   assert.deepEqual(engine.config.persistentPaths, []);
   assert.deepEqual(engine.config.args, ["--main-pack", "engine/godot.zip"]);
-  assert.equal(globalThis.GameGlobal.godotMiniGameBridgeV1, globalThis.godotSdk);
+  assert.equal(globalThis.GameGlobal.godotMiniGameBridgeV1, globalThis.GameGlobal?.godotSdk || globalThis.godotSdk);
 
   fixture.triggerHide();
   await loader._syncPromise;

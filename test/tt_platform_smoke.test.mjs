@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
+import vm from "node:vm";
 
 const projectRoot = path.resolve(import.meta.dirname, "..");
 const commonRoot = path.join(projectRoot, "addons/godot_mini_game/templates/common");
@@ -9,12 +10,8 @@ function read(relativePath) {
   return fs.readFileSync(path.join(commonRoot, relativePath), "utf8");
 }
 
-function moduleUrl(source) {
-  return `data:text/javascript;charset=utf-8,${encodeURIComponent(source)}#${Date.now()}-${Math.random()}`;
-}
-
-function replaceSpecifier(source, specifier, replacement) {
-  return source.replaceAll(JSON.stringify(specifier), JSON.stringify(replacement));
+function execSource(source, filename) {
+  vm.runInThisContext(`(function(){${source}})()`, { filename });
 }
 
 function makeCanvas() {
@@ -118,12 +115,11 @@ function installByteDanceGlobals(platform) {
 async function testByteDanceAdapterFetchLoaderAndSdkImports(platform) {
   const counters = installByteDanceGlobals(platform);
 
-  const runtimeUrl = moduleUrl(read("js/platform_runtime.js"));
+  // Execute platform_runtime.js (sets PlatformRuntime global)
+  execSource(read("js/platform_runtime.js"), "platform_runtime.js");
 
-  const adapterUrl = moduleUrl(
-    replaceSpecifier(read("adapter.js"), "./js/platform_runtime", runtimeUrl),
-  );
-  await import(adapterUrl);
+  // Execute adapter.js (reads PlatformRuntime from globals)
+  execSource(read("adapter.js"), "adapter.js");
 
   const expectedDpr = platform === "tiktok" ? 2 : 1;
   assert.equal(globalThis.GameGlobal.PlatformRuntime.platform, platform);
@@ -133,16 +129,13 @@ async function testByteDanceAdapterFetchLoaderAndSdkImports(platform) {
   assert.equal(globalThis.GameGlobal.__adapter.canvas.width, 360 * expectedDpr);
   assert.equal(globalThis.GameGlobal.__adapter.canvas.height, 780 * expectedDpr);
 
-  const fetchUrl = moduleUrl(
-    replaceSpecifier(read("fetch.js"), "./js/platform_runtime", runtimeUrl),
-  );
-  await import(fetchUrl);
+  // Execute fetch.js (reads PlatformRuntime from globals)
+  execSource(read("fetch.js"), "fetch.js");
   assert.equal(typeof globalThis.GameGlobal.fetch, "function");
 
-  const sdkUrl = moduleUrl(
-    replaceSpecifier(read("js/libs/sdk.js"), "../platform_runtime", runtimeUrl),
-  );
-  const { GodotSDK } = await import(sdkUrl);
+  // Execute sdk.js (reads PlatformRuntime from globals, sets godotSdk)
+  execSource(read("js/libs/sdk.js"), "sdk.js");
+  const GodotSDK = globalThis.GameGlobal?.godotSdk || globalThis.godotSdk;
   const standaloneSdk = new GodotSDK();
   assert.equal(JSON.parse(standaloneSdk.getBridgeInfo()).platform, platform);
 
@@ -185,23 +178,27 @@ async function testByteDanceAdapterFetchLoaderAndSdkImports(platform) {
     assert.equal(counters.batteryInfoSyncCalls(), 1);
   }
 
-  const godotStubUrl = moduleUrl("export {};");
-  const imageLoaderStubUrl = moduleUrl(
-    "export function waitForImage() { return Promise.resolve(); }",
-  );
-  let loaderSource = read("js/loader.js");
-  loaderSource = replaceSpecifier(loaderSource, "./libs/godot", godotStubUrl);
-  loaderSource = replaceSpecifier(loaderSource, "./libs/sdk", sdkUrl);
-  loaderSource = replaceSpecifier(loaderSource, "./image_loader", imageLoaderStubUrl);
-  loaderSource = replaceSpecifier(loaderSource, "./platform_runtime", runtimeUrl);
-  const { default: Loader } = await import(moduleUrl(loaderSource));
+  // Set up stubs for loader.js dependencies
+  globalThis.GameGlobal.__waitForImage = () => Promise.resolve();
+  globalThis.require = (id) => {
+    if (id === "./platform_runtime" || id === "./libs/sdk" || id === "./libs/godot" || id === "./image_loader") {
+      // already loaded or stubbed
+    }
+  };
+  try {
+    execSource(read("js/loader.js"), "loader.js");
+  } finally {
+    delete globalThis.require;
+  }
 
+  const Loader = globalThis.GameGlobal?.__GodotLoader || globalThis.__GodotLoader;
   assert.equal(typeof Loader, "function");
-  assert.equal(globalThis.GameGlobal.godotSdk, globalThis.godotSdk);
-  assert.equal(globalThis.GameGlobal.__adapter.window.godotSdk, globalThis.godotSdk);
-  assert.equal(globalThis.GameGlobal.godotMiniGameBridgeV1, globalThis.godotSdk);
-  assert.equal(globalThis.GameGlobal.__adapter.window.godotMiniGameBridgeV1, globalThis.godotSdk);
-  assert.equal(JSON.parse(globalThis.godotSdk.getBridgeInfo()).platform, platform);
+  const _sdkRef = globalThis.GameGlobal?.godotSdk || globalThis.godotSdk;
+  assert.equal(globalThis.GameGlobal.godotSdk, _sdkRef);
+  assert.equal(globalThis.GameGlobal.__adapter.window.godotSdk, _sdkRef);
+  assert.equal(globalThis.GameGlobal.godotMiniGameBridgeV1, _sdkRef);
+  assert.equal(globalThis.GameGlobal.__adapter.window.godotMiniGameBridgeV1, _sdkRef);
+  assert.equal(JSON.parse(_sdkRef.getBridgeInfo()).platform, platform);
 }
 
 for (const platform of ["douyin", "tiktok"]) {

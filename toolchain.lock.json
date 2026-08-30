@@ -1,0 +1,102 @@
+{
+  "schema": 1,
+  "generated_at": "2026-08-29T00:00:00Z",
+  "plugin_version": "0.3.0",
+  "repository": {
+    "remote": "https://github.com/AnranS/godot_for_minigame.git",
+    "commit": "2b6cb70884e3126cc69075b9c90f53509f25153c",
+    "branch": "main",
+    "tag": "v0.2.1-9-g2b6cb70",
+    "clean": true
+  },
+  "certified_baseline": {
+    "godot_version": "4.6.1.stable",
+    "godot_tag": "4.6.1-stable",
+    "godot_commit": "14d19694e0c88a3f9e82d899a0400f27a24c176e",
+    "emscripten_version": "4.0.3",
+    "profile": "2d_full",
+    "target": "release",
+    "template_revision": 1,
+    "bridge_abi": 1,
+    "template_schema": 1,
+    "output_manifest_schema": 1
+  },
+  "engine_template": {
+    "source": "bundled",
+    "path": "addons/godot_mini_game/engine/",
+    "manifest": "template.json",
+    "artifacts": {
+      "godot.js": {
+        "size": 283251,
+        "sha256_actual": "fd8265eed945d669189eb6960f9ebca40863a7d00e87c5d9bdd5868e55b1203b",
+        "sha256_expected": "fd8265eed945d669189eb6960f9ebca40863a7d00e87c5d9bdd5868e55b1203b",
+        "match": true,
+        "note": "Fixed: CRLF→LF line ending normalization applied to match template.json"
+      },
+      "godot.wasm.br": {
+        "size": 6342168,
+        "sha256_actual": "f81067a1d30125b161c26097bf4976c20064a1543d2c56b1c7cdcce10ae764cd",
+        "sha256_expected": "f81067a1d30125b161c26097bf4976c20064a1543d2c56b1c7cdcce10ae764cd",
+        "match": true
+      }
+    }
+  },
+  "platforms": {
+    "wechat": {
+      "runtime_type": "native",
+      "api_namespace": "wx",
+      "subpackage_field": "subpackages",
+      "requires_private_config": true,
+      "validation": {
+        "export_smoke": "automated",
+        "devtool_compile": "manual",
+        "real_device": "manual"
+      }
+    },
+    "douyin": {
+      "runtime_type": "native",
+      "api_namespace": "tt",
+      "subpackage_field": "subPackages",
+      "requires_private_config": false,
+      "validation": {
+        "export_smoke": "automated",
+        "devtool_compile": "manual",
+        "real_device": "manual"
+      }
+    },
+    "tiktok": {
+      "runtime_type": "native",
+      "api_namespace": "TTMinis.game",
+      "subpackage_field": "subpackages",
+      "requires_private_config": false,
+      "support_tier": "beta",
+      "validation": {
+        "export_smoke": "automated",
+        "devtool_compile": "required",
+        "real_device": "required-for-release"
+      }
+    }
+  },
+  "build_tools": {
+    "scons": "4.9.1",
+    "python": "3.12+",
+    "brotli": "system",
+    "node": "system",
+    "wabt": "system"
+  },
+  "known_issues": [
+    {
+      "id": "BUNDLED-TEMPLATE-CRLF-ISSUE",
+      "severity": "resolved",
+      "description": "FIXED: godot.js had CRLF line endings which changed its SHA-256 from the template.json hash. Applied CRLF→LF normalization. Root cause: git checkout on Windows with core.autocrlf=true converted line endings.",
+      "affected_files": ["addons/godot_mini_game/engine/godot.js"],
+      "fix": "Applied in this session: CRLF→LF normalization via PowerShell"
+    },
+    {
+      "id": "V030-NOT-TAGGED",
+      "severity": "non-blocking",
+      "description": "Plugin version 0.3.0 is declared in plugin.cfg and support-matrix.json but no git tag v0.3.0 exists.",
+      "fix": "Run scripts/release_plugin.sh 0.3.0 after all P1 checks pass"
+    }
+  ]
+}

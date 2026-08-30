@@ -44,6 +44,52 @@ export const releaseData = {
         "devtoolCompile": "required",
         "realDevice": "required-for-release"
       }
+    },
+    "alipay": {
+      "runtimeType": "native",
+      "supportTier": "experimental",
+      "apiNamespace": "my",
+      "subpackageField": "subpackages",
+      "validation": {
+        "exportSmoke": "automated",
+        "devtoolCompile": "manual",
+        "realDevice": "manual"
+      }
+    },
+    "baidu": {
+      "runtimeType": "native",
+      "supportTier": "experimental",
+      "apiNamespace": "swan",
+      "subpackageField": "subpackages",
+      "validation": {
+        "exportSmoke": "automated",
+        "devtoolCompile": "manual",
+        "realDevice": "manual"
+      }
+    },
+    "qq": {
+      "runtimeType": "native",
+      "supportTier": "experimental",
+      "apiNamespace": "qq",
+      "subpackageField": "subpackages",
+      "requiresPrivateConfig": true,
+      "validation": {
+        "exportSmoke": "automated",
+        "devtoolCompile": "manual",
+        "realDevice": "manual"
+      }
+    },
+    "kuaishou": {
+      "runtimeType": "native",
+      "supportTier": "experimental",
+      "apiNamespace": "ks",
+      "subpackageField": "subpackages",
+      "forbidsJavascriptEval": true,
+      "validation": {
+        "exportSmoke": "automated",
+        "devtoolCompile": "manual",
+        "realDevice": "manual"
+      }
     }
   },
   "bundled": {
@@ -60,7 +106,11 @@ export const releaseData = {
     "platforms": {
       "wechat": "automated",
       "douyin": "automated",
-      "tiktok": "automated"
+      "tiktok": "automated",
+      "alipay": "automated",
+      "baidu": "automated",
+      "qq": "automated",
+      "kuaishou": "automated"
     }
   },
   "certified": [
@@ -78,7 +128,11 @@ export const releaseData = {
       "platforms": {
         "wechat": "automated",
         "douyin": "automated",
-        "tiktok": "automated"
+        "tiktok": "automated",
+        "alipay": "automated",
+        "baidu": "automated",
+        "qq": "automated",
+        "kuaishou": "automated"
       }
     }
   ]

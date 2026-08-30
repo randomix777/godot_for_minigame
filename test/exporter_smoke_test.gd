@@ -30,8 +30,8 @@ func _run() -> void:
 	var root := OS.get_temp_dir().path_join(
 		"godot-mini-game-smoke-%d-%d" % [OS.get_process_id(), Time.get_ticks_usec()]
 	)
-	var output := root.path_join("shared-output")
 	for platform in Exporter.SUPPORTED_PLATFORMS:
+		var output := root.path_join(platform)
 		var err := await exporter.export_mini_game(
 			platform, "test-app", "portrait", preset_name, output)
 		var game_config := Exporter._read_json_dictionary(

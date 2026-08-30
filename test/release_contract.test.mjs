@@ -21,11 +21,11 @@ assert.equal(supportMatrix.requiresExactEngineTemplate, true);
 assert.ok(Number.isInteger(supportMatrix.templateSchema) && supportMatrix.templateSchema > 0);
 assert.ok(Number.isInteger(supportMatrix.outputManifestSchema) && supportMatrix.outputManifestSchema > 0);
 assert.ok(Array.isArray(supportMatrix.certified) && supportMatrix.certified.length > 0);
-const expectedPlatforms = ["douyin", "tiktok", "wechat"];
+const expectedPlatforms = ["alipay", "baidu", "douyin", "kuaishou", "qq", "tiktok", "wechat"];
 assert.deepEqual(
   Object.keys(supportMatrix.platformContracts || {}).sort(),
   expectedPlatforms,
-  "support matrix must define exactly the three exported platforms",
+  "support matrix must define exactly the seven exported platforms",
 );
 const { wechat: wechatContract, douyin: douyinContract, tiktok: tiktokContract } = supportMatrix.platformContracts;
 assert.equal(wechatContract.runtimeType, "native");
@@ -139,6 +139,10 @@ for (const [platform, expected] of [
   ["wechat", "wechat"],
   ["douyin", "douyin"],
   ["tiktok", "tiktok"],
+  ["alipay", "alipay"],
+  ["baidu", "baidu"],
+  ["qq", "qq"],
+  ["kuaishou", "kuaishou"],
 ]) {
   const entry = read(`addons/godot_mini_game/templates/${platform}/game.js`);
   assert.ok(

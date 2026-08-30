@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "generated": "2025-01-01T00:00:00Z",
+  "templates": [
+    {
+      "versionKey": "4.6.1_stable_2d_full_release_r1",
+      "godotVersion": "4.6.1.stable",
+      "godotTag": "4.6.1-stable",
+      "godotCommit": "14d19694e0c88a3f9e82d899a0400f27a24c176e",
+      "emscriptenVersion": "4.0.3",
+      "profile": "2d_full",
+      "target": "release",
+      "templateRevision": 1,
+      "bridgeAbi": 1,
+      "filename": "godot_minigame_template_4.6.1-stable_emsdk-4.0.3_2d-full_release_abi-1_r1.zip",
+      "downloadUrl": "https://github.com/user/godot-minigame/releases/download/template-4.6.1-stable/godot_minigame_template_4.6.1-stable_emsdk-4.0.3_2d-full_release_abi-1_r1.zip",
+      "sha256": "",
+      "sizeBytes": 0,
+      "bundled": true
+    },
+    {
+      "versionKey": "4.7.1_stable_2d_full_release_r1",
+      "godotVersion": "4.7.1.stable",
+      "godotTag": "4.7.1-stable",
+      "godotCommit": "a13da4feb8d8aefc283c3763d33a2f170a18d541",
+      "emscriptenVersion": "4.0.3",
+      "profile": "2d_full",
+      "target": "release",
+      "templateRevision": 1,
+      "bridgeAbi": 1,
+      "filename": "godot_minigame_template_4.7.1-stable_emsdk-4.0.3_2d-full_release_abi-1_r1.zip",
+      "downloadUrl": "https://github.com/user/godot-minigame/releases/download/template-4.7.1-stable/godot_minigame_template_4.7.1-stable_emsdk-4.0.3_2d-full_release_abi-1_r1.zip",
+      "sha256": "",
+      "sizeBytes": 0,
+      "bundled": false
+    }
+  ]
+}

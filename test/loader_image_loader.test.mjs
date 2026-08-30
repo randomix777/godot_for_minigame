@@ -1,11 +1,14 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
+import vm from "node:vm";
 
 const projectRoot = path.resolve(import.meta.dirname, "..");
 const helperPath = path.join(projectRoot, "addons/godot_mini_game/templates/common/js/image_loader.js");
 const helperSource = fs.readFileSync(helperPath, "utf8");
-const { waitForImage } = await import(`data:text/javascript;charset=utf-8,${encodeURIComponent(helperSource)}`);
+// image_loader.js no longer has ES module exports — execute it and read globals
+vm.runInThisContext(`(function(){${helperSource}})()`, { filename: "image_loader.js" });
+const waitForImage = globalThis.__waitForImage;
 
 async function testAlreadyCompletedImageResolvesImmediately() {
   const image = { complete: true };

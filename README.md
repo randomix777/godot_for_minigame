@@ -30,15 +30,15 @@
 ---
 
 Godot Mini Game turns a normal Godot project into a platform-ready WeChat,
-Douyin, or TikTok Mini Game package. Day-to-day export does not require Node.js, Brotli,
-Emscripten, or a separate Godot Web template download.
+Douyin, TikTok, Alipay, Baidu, QQ, or Kuaishou Mini Game package. Day-to-day export
+does not require Node.js, Brotli, Emscripten, or a separate Godot Web template download.
 
 ## Why Godot Mini Game?
 
 | | |
 |---|---|
 | **Editor-native workflow**<br />Build the PCK, assemble platform files, validate, and publish from one Dock. | **Exact template identity**<br />Godot source, Emscripten, profile, revision, schemas, features, and hashes stay aligned. |
-| **One capability-gated SDK**<br />`MiniGameSDK` exposes 224 methods and 83 signals over `wx`, `tt`, and `TTMinis.game`; availability still depends on the selected host. | **Guarded publishing**<br />Staging, ownership manifests, hashes, an output lock, backup, and rollback protect managed paths while preserving sidecars. |
+| **One capability-gated SDK**<br />`MiniGameSDK` exposes 224 methods and 83 signals over `wx`, `tt`, `TTMinis.game`, `my`, `swan`, `qq`, and `ks`; availability depends on the selected host. | **Guarded publishing**<br />Staging, ownership manifests, hashes, an output lock, backup, and rollback protect managed paths while preserving sidecars. |
 
 ## Architecture
 
@@ -53,7 +53,7 @@ Emscripten, or a separate Godot Web template download.
 
 <p align="center"><sub>Click the diagram to open it at full size.</sub></p>
 
-- **Export control plane** — each transaction selects WeChat, Douyin, or TikTok Native, resolves one complete engine bundle, assembles outside the destination, validates every managed artifact, and publishes under a lock.
+- **Export control plane** — each transaction selects one of 7 platforms (WeChat, Douyin, TikTok, Alipay, Baidu, QQ, Kuaishou), resolves one complete engine bundle, assembles outside the destination, validates every managed artifact, and publishes under a lock.
 - **Exported package runtime** — `game.js` selects exactly one `PlatformRuntime` provider; the loader starts the patched engine and PCK, while `GodotSDK` and `MiniGameSDK` negotiate the Bridge ABI.
 
 The publish step has in-process rollback and records recovery evidence, but is
@@ -70,9 +70,13 @@ not a filesystem-wide crash-atomic primitive. Full boundaries are documented in
 | Build | `2d_full` · `release` · revision `1` |
 | Runtime contract | Bridge ABI `1` · template schema `1` · output schema `1` |
 
-- ✅ **WeChat Mini Game (`wx`)** — full export, manifest, WASM, and package checks.
-- ✅ **Douyin Mini Game (`tt`)** — full export, manifest, WASM, and package checks.
-- 🧪 **TikTok Mini Game Native (`TTMinis.game`)** — first-class **beta** target with automated export checks. Requires TikTok client 43.4.0+, `ttmg` DevTool compilation, and real-device validation before release.
+- ✅ **WeChat Mini Game (`wx`)** — full export, manifest, WASM, and package checks. DevTools + real device verified.
+- ✅ **Douyin Mini Game (`tt`)** — full export, manifest, WASM, and package checks. DevTools verified.
+- 🧪 **TikTok Mini Game Native (`TTMinis.game`)** — **beta** target with automated export checks. Requires TikTok client 43.4.0+, `ttmg` DevTool compilation, and real-device validation before release.
+- 🔬 **Alipay Mini Game (`my`)** — experimental. Automated export smoke only. Requires Alipay DevTools verification.
+- 🔬 **Baidu Mini Game (`swan`)** — experimental. Automated export smoke only. Requires Baidu DevTools verification.
+- 🔬 **QQ Mini Game (`qq`)** — experimental. Automated export smoke only. Requires QQ DevTools verification.
+- 🔬 **Kuaishou Mini Game (`ks`)** — experimental. Automated export smoke only. Requires Kuaishou DevTools verification. Note: `eval()` is forbidden on this platform.
 
 > [!IMPORTANT]
 > The bundled engine is validated by this project only for the exact identity

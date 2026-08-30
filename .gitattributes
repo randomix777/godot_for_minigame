@@ -1,0 +1,22 @@
+# Godot engine binaries must not have CRLF line endings
+# The exporter's _patch_godot_js() constructs patch patterns with LF only;
+# CRLF conversion causes content.find() to fail with "缺少 WebAssembly wrapper 补丁锚点"
+addons/godot_mini_game/engine/godot.js -text
+addons/godot_mini_game/engine/godot.wasm.br binary
+
+# Ensure consistent line endings for source code
+*.gd text eol=lf
+*.js text eol=lf
+*.mjs text eol=lf
+*.json text eol=lf
+*.template text eol=lf
+*.html text eol=lf
+*.css text eol=lf
+*.md text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.sh text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
+*.bat text eol=crlf
+*.ps1 text eol=crlf

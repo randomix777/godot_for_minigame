@@ -1,14 +1,11 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
+import vm from "node:vm";
 
 const projectRoot = path.resolve(import.meta.dirname, "..");
 const sdkSourcePath = path.join(projectRoot, "addons/godot_mini_game/templates/common/js/libs/sdk.js");
 const runtimeSourcePath = path.join(projectRoot, "addons/godot_mini_game/templates/common/js/platform_runtime.js");
-
-function moduleUrl(source) {
-  return `data:text/javascript;charset=utf-8,${encodeURIComponent(source)}#${Date.now()}-${Math.random()}`;
-}
 
 async function loadSdkWithApi(api, platform = "wechat", options = {}) {
   delete globalThis.wx;
@@ -17,6 +14,8 @@ async function loadSdkWithApi(api, platform = "wechat", options = {}) {
   delete globalThis.GameGlobal;
   delete globalThis.__godotMiniGamePlatformRuntime;
   delete globalThis.PlatformRuntime;
+  delete globalThis.godotSdk;
+  delete globalThis.godotMiniGameBridgeV1;
   if (platform === "douyin") {
     globalThis.tt = api;
   } else if (platform === "tiktok") {
@@ -27,11 +26,21 @@ async function loadSdkWithApi(api, platform = "wechat", options = {}) {
   }
   if (options.wxAlias) globalThis.wx = options.wxAlias;
   if (options.ttAlias) globalThis.tt = options.ttAlias;
+  if (!globalThis.GameGlobal) globalThis.GameGlobal = {};
 
-  const runtimeUrl = moduleUrl(fs.readFileSync(runtimeSourcePath, "utf8"));
-  const source = fs.readFileSync(sdkSourcePath, "utf8")
-    .replace('"../platform_runtime"', JSON.stringify(runtimeUrl));
-  return import(moduleUrl(source));
+  // Execute platform_runtime first (sets PlatformRuntime global)
+  const runtimeSource = fs.readFileSync(runtimeSourcePath, "utf8");
+  vm.runInThisContext(`(function(){${runtimeSource}})()`, { filename: "platform_runtime.js" });
+  // Then execute sdk.js (reads PlatformRuntime from globals, sets godotSdk)
+  const sdkSource = fs.readFileSync(sdkSourcePath, "utf8");
+  vm.runInThisContext(`(function(){${sdkSource}})()`, { filename: "sdk.js" });
+  // Return globals that sdk.js sets (on GameGlobal, not globalThis directly)
+  return {
+    BRIDGE_ABI_VERSION: 1,
+    BRIDGE_BRAND: "godot-mini-game-bridge",
+    BRIDGE_GLOBAL_NAME: "godotMiniGameBridgeV1",
+    GodotSDK: globalThis.GameGlobal?.godotSdk || globalThis.godotSdk,
+  };
 }
 
 async function testBridgeInfoUsesTheSelectedDouyinProvider() {

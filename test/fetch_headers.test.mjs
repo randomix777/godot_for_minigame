@@ -1,13 +1,10 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
+import vm from "node:vm";
 
 const projectRoot = path.resolve(import.meta.dirname, "..");
 const commonRoot = path.join(projectRoot, "addons/godot_mini_game/templates/common");
-
-function moduleUrl(source) {
-  return `data:text/javascript;charset=utf-8,${encodeURIComponent(source)}#${Date.now()}-${Math.random()}`;
-}
 
 async function loadFetchFixture() {
   delete globalThis.wx;
@@ -32,10 +29,11 @@ async function loadFetchFixture() {
   };
 
   const runtimeSource = fs.readFileSync(path.join(commonRoot, "js/platform_runtime.js"), "utf8");
-  const runtimeUrl = moduleUrl(runtimeSource);
-  const fetchSource = fs.readFileSync(path.join(commonRoot, "fetch.js"), "utf8")
-    .replace('"./js/platform_runtime"', JSON.stringify(runtimeUrl));
-  await import(moduleUrl(fetchSource));
+  const fetchSource = fs.readFileSync(path.join(commonRoot, "fetch.js"), "utf8");
+  // Execute platform_runtime first (sets PlatformRuntime global)
+  vm.runInThisContext(`(function(){${runtimeSource}})()`, { filename: "platform_runtime.js" });
+  // Then execute fetch.js (reads PlatformRuntime from globals)
+  vm.runInThisContext(`(function(){${fetchSource}})()`, { filename: "fetch.js" });
   return { calls, ...globalThis.GameGlobal };
 }
 

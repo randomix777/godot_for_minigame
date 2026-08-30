@@ -45,6 +45,52 @@
         "devtoolCompile": "required",
         "realDevice": "required-for-release"
       }
+    },
+    "alipay": {
+      "runtimeType": "native",
+      "supportTier": "experimental",
+      "apiNamespace": "my",
+      "subpackageField": "subpackages",
+      "validation": {
+        "exportSmoke": "automated",
+        "devtoolCompile": "manual",
+        "realDevice": "manual"
+      }
+    },
+    "baidu": {
+      "runtimeType": "native",
+      "supportTier": "experimental",
+      "apiNamespace": "swan",
+      "subpackageField": "subpackages",
+      "validation": {
+        "exportSmoke": "automated",
+        "devtoolCompile": "manual",
+        "realDevice": "manual"
+      }
+    },
+    "qq": {
+      "runtimeType": "native",
+      "supportTier": "experimental",
+      "apiNamespace": "qq",
+      "subpackageField": "subpackages",
+      "requiresPrivateConfig": true,
+      "validation": {
+        "exportSmoke": "automated",
+        "devtoolCompile": "manual",
+        "realDevice": "manual"
+      }
+    },
+    "kuaishou": {
+      "runtimeType": "native",
+      "supportTier": "experimental",
+      "apiNamespace": "ks",
+      "subpackageField": "subpackages",
+      "forbidsJavascriptEval": true,
+      "validation": {
+        "exportSmoke": "automated",
+        "devtoolCompile": "manual",
+        "realDevice": "manual"
+      }
     }
   },
   "certified": [
@@ -62,8 +108,48 @@
       "platforms": {
         "wechat": "automated",
         "douyin": "automated",
-        "tiktok": "automated"
+        "tiktok": "automated",
+        "alipay": "automated",
+        "baidu": "automated",
+        "qq": "automated",
+        "kuaishou": "automated"
       }
+    }
+  ],
+  "planned": [
+    {
+      "godotVersion": "4.7.1.stable",
+      "godotTag": "4.7.1-stable",
+      "godotCommit": "a13da4feb8d8aefc283c3763d33a2f170a18d541",
+      "emscriptenVersion": "4.0.3",
+      "profile": "2d_full",
+      "target": "release",
+      "templateRevision": 1,
+      "template": {
+        "source": "release",
+        "releaseTag": "template-4.7.1-stable-emsdk-4.0.3-2d-full-release-abi-1-r1",
+        "asset": "godot_minigame_template_4.7.1-stable_emsdk-4.0.3_2d-full_release_abi-1_r1.zip",
+        "available": false,
+        "note": "Template asset not yet published to GitHub releases. Cannot certify until asset is available."
+      },
+      "platforms": {}
+    },
+    {
+      "godotVersion": "4.7.2.stable",
+      "godotTag": "4.7.2-stable",
+      "godotCommit": "ed1daf0bf001b61586d9930840f2f1394092c079",
+      "emscriptenVersion": "4.0.3",
+      "profile": "2d_full",
+      "target": "release",
+      "templateRevision": 1,
+      "template": {
+        "source": "release",
+        "releaseTag": "template-4.7.2-stable-emsdk-4.0.3-2d-full-release-abi-1-r1",
+        "asset": "godot_minigame_template_4.7.2-stable_emsdk-4.0.3_2d-full_release_abi-1_r1.zip",
+        "available": false,
+        "note": "Template asset not yet published to GitHub releases. Requires building from Godot source with minigame patches."
+      },
+      "platforms": {}
     }
   ]
 }
