@@ -102,9 +102,7 @@
       "profile": "2d_full",
       "target": "release",
       "templateRevision": 1,
-      "template": {
-        "source": "bundled"
-      },
+      "template": { "source": "bundled" },
       "platforms": {
         "wechat": "automated",
         "douyin": "automated",
@@ -130,7 +128,7 @@
         "releaseTag": "template-4.7.1-stable-emsdk-4.0.3-2d-full-release-abi-1-r1",
         "asset": "godot_minigame_template_4.7.1-stable_emsdk-4.0.3_2d-full_release_abi-1_r1.zip",
         "available": false,
-        "note": "Template asset not yet published to GitHub releases. Cannot certify until asset is available."
+        "note": "Template asset not yet published to GitHub releases."
       },
       "platforms": {}
     },
@@ -143,11 +141,12 @@
       "target": "release",
       "templateRevision": 1,
       "template": {
-        "source": "release",
+        "source": "bundled",
         "releaseTag": "template-4.7.2-stable-emsdk-4.0.3-2d-full-release-abi-1-r1",
         "asset": "godot_minigame_template_4.7.2-stable_emsdk-4.0.3_2d-full_release_abi-1_r1.zip",
-        "available": false,
-        "note": "Template asset not yet published to GitHub releases. Requires building from Godot source with minigame patches."
+        "available": true,
+        "sha256": "d2aedb28afcc877a8f53b63a60e2d851ea88b7780bd93c2eb1f1064465589133",
+        "sizeBytes": 7025920
       },
       "platforms": {}
     }
