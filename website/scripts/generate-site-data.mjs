@@ -28,15 +28,18 @@ if (!Number.isInteger(matrix.outputManifestSchema) || matrix.outputManifestSchem
 const tiktokContract = matrix.platformContracts?.tiktok;
 if (
   tiktokContract?.runtimeType !== "native"
-  || tiktokContract?.supportTier !== "beta"
+  || tiktokContract?.supportTier !== "disabled"
+  || tiktokContract?.enabled !== false
+  || tiktokContract?.disabledInVersion !== pluginVersion
   || tiktokContract?.apiNamespace !== "TTMinis.game"
   || tiktokContract?.minimumClientVersion !== "43.4.0"
   || tiktokContract?.subpackageField !== "subpackages"
   || tiktokContract?.devtool !== "ttmg"
-  || tiktokContract?.validation?.devtoolCompile !== "required"
-  || tiktokContract?.validation?.realDevice !== "required-for-release"
+  || tiktokContract?.validation?.exportSmoke !== "disabled"
+  || tiktokContract?.validation?.devtoolCompile !== "not-applicable"
+  || tiktokContract?.validation?.realDevice !== "not-applicable"
 ) {
-  throw new Error("support-matrix.json must declare the TikTok contract, Native runtime, beta tier, and validation gates");
+  throw new Error("support-matrix.json must retain the disabled TikTok contract without exposing release gates");
 }
 
 const bundledRows = matrix.certified.filter((target) => target.template?.source === "bundled");

@@ -61,8 +61,14 @@ func _init() -> void:
 	var exporter := Exporter.new()
 	DirAccess.make_dir_recursive_absolute(_root)
 	_assert_true(
-		Array(Exporter.SUPPORTED_PLATFORMS) == ["wechat", "douyin", "tiktok"],
-		"the exporter must expose all three native platforms",
+		Array(Exporter.SUPPORTED_PLATFORMS) == [
+			"wechat", "douyin", "tiktok", "alipay", "baidu", "qq", "kuaishou"
+		],
+		"the exporter must retain all implemented platform contracts",
+	)
+	_assert_true(
+		Array(Exporter.DISABLED_PLATFORMS) == ["tiktok"],
+		"TikTok must remain disabled for v0.3.0",
 	)
 	var expected_contracts := {
 		"wechat": {"api_namespace": "wx", "subpackage_field": "subpackages"},
@@ -71,6 +77,10 @@ func _init() -> void:
 			"api_namespace": "TTMinis.game",
 			"subpackage_field": "subpackages",
 		},
+		"alipay": {"api_namespace": "my", "subpackage_field": "subpackages"},
+		"baidu": {"api_namespace": "swan", "subpackage_field": "subpackages"},
+		"qq": {"api_namespace": "qq", "subpackage_field": "subpackages"},
+		"kuaishou": {"api_namespace": "ks", "subpackage_field": "subpackages"},
 	}
 
 	for platform in Exporter.SUPPORTED_PLATFORMS:

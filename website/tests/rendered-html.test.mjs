@@ -8,8 +8,8 @@ test("exports a complete static homepage", async () => {
   const html = await readFile(new URL("../dist/client/index.html", import.meta.url), "utf8");
 
   assert.match(html, /Godot Mini Game/);
-  assert.match(html, /微信、抖音与 TikTok/);
-  assert.match(html, />TikTok<\/span>/);
+  assert.match(html, /微信与抖音/);
+  assert.doesNotMatch(html, />TikTok<\/span>/);
   assert.doesNotMatch(html, /TikTok Native|TTMinis\.game|TTWebAssembly|ttmg init|support tier is beta/);
   assert.match(html, /subPackages/);
   assert.match(html, /subpackages/);
@@ -17,7 +17,7 @@ test("exports a complete static homepage", async () => {
   assert.match(html, /href="(?:\/godot_for_minigame)?\/api\/"/);
   assert.match(html, /og\.png/);
   assert.match(html, /douyin\.svg/);
-  assert.match(html, /tiktok\.svg/);
+  assert.doesNotMatch(html, /tiktok\.svg/);
   assert.match(html, /id="architecture"/);
   assert.match(html, /<figure class="architecture-diagram/);
   assert.match(html, /<ol class="architecture-path"/);
@@ -34,7 +34,7 @@ test("exports a complete static homepage", async () => {
   assert.match(html, /adapter\.js \+ PlatformRuntime/);
   assert.match(html, /微信小游戏/);
   assert.match(html, /抖音小游戏/);
-  assert.match(html, /TikTok Mini Game/);
+  assert.doesNotMatch(html, /TikTok Mini Game/);
   assert.doesNotMatch(html, /architecture-stage-head|transaction publish|atomic publish|>CLI</);
   assert.match(html, /v0\.3\.0/);
   assert.match(html, /godot_mini_game_vX\.Y\.Z\.zip/);

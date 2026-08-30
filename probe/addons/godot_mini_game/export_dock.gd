@@ -6,12 +6,10 @@ const Exporter = preload("res://addons/godot_mini_game/exporter.gd")
 const PLATFORM_OPTIONS := [
 	["微信小游戏", "wechat"],
 	["抖音小游戏", "douyin"],
-	["TikTok Mini Game", "tiktok"],
 ]
 const PLATFORM_DISPLAY_NAMES := {
 	"wechat": "微信小游戏",
 	"douyin": "抖音小游戏",
-	"tiktok": "TikTok Mini Game",
 }
 const ORIENTATION_OPTIONS := [
 	["竖屏 (portrait)", "portrait"],

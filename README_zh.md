@@ -1,14 +1,14 @@
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="assets/banner-dark-v2.png" />
-    <img src="assets/banner-light.png" width="720" alt="Godot 项目通过 Godot Mini Game 导出为微信、抖音与 TikTok 小游戏" />
+    <img src="assets/banner-light.png" width="720" alt="Godot 项目通过 Godot Mini Game 导出为微信与抖音小游戏" />
   </picture>
 </p>
 
 <h1 align="center">Godot Mini Game</h1>
 
 <p align="center">
-  <strong>将 Godot 游戏导出为微信、抖音与 TikTok 小游戏。</strong><br />
+  <strong>将 Godot 游戏导出为微信与抖音小游戏。</strong><br />
   经项目 CI 验证的 WASM 引擎 · 带保护边界的导出事务 · 一套版本化 GDScript SDK
 </p>
 
@@ -29,7 +29,7 @@
 
 ---
 
-Godot Mini Game 可以把普通 Godot 项目转换成微信、抖音或 TikTok 小游戏工程。日常导出
+Godot Mini Game 可以把普通 Godot 项目转换成微信、抖音及实验平台小游戏工程。日常导出
 不需要安装 Node.js、Brotli、Emscripten，也不需要另外下载 Godot Web 导出模板。
 
 ## 为什么选择 Godot Mini Game？
@@ -52,7 +52,7 @@ Godot Mini Game 可以把普通 Godot 项目转换成微信、抖音或 TikTok �
 
 <p align="center"><sub>点击架构图可查看原始尺寸。</sub></p>
 
-- **导出控制面**——每次事务从7个平台（微信、抖音、TikTok、支付宝、百度、QQ、快手）中选择一个，解析一个完整引擎模板包，在目标目录之外装配，验证所有受管产物，再在锁内发布。
+- **导出控制面**——每次事务从6个已启用平台（微信、抖音、支付宝、百度、QQ、快手）中选择一个，解析一个完整引擎模板包，在目标目录之外装配，验证所有受管产物，再在锁内发布。
 - **导出产物运行时**——`game.js` 只选择一个 `PlatformRuntime` Provider；Loader 启动修补后的引擎与 PCK，`GodotSDK` 和 `MiniGameSDK` 协商 Bridge ABI。
 
 发布过程支持进程内失败回滚并记录恢复证据，但它不是跨文件系统的 crash-atomic
@@ -69,15 +69,14 @@ Godot Mini Game 可以把普通 Godot 项目转换成微信、抖音或 TikTok �
 | 运行时契约 | Bridge ABI `1` · template schema `1` · output schema `1` |
 
 - ✅ **微信小游戏（`wx`）**——完整导出、Manifest、WASM 与包结构检查。
-- ✅ **抖音小游戏（`tt`）**——完整导出、Manifest、WASM 与包结构检查。
-- 🧪 **TikTok Mini Game Native（`TTMinis.game`）**——一级 **beta** 目标，已有自动导出检查；发布前仍要求 TikTok 客户端 43.4.0+、`ttmg` DevTool 编译与真机验证。
+- ✅ **抖音小游戏（`tt`）**——完整导出、Manifest、WASM 与包结构检查，开发者工具和真机验证均已通过。
+- ⛔ **TikTok Mini Game Native（`TTMinis.game`）**——v0.3.0 中禁用。实现代码暂时保留，但 Dock 和导出 API 均不提供该目标。
 
 > [!IMPORTANT]
 > 内置引擎只经过本项目对上述精确身份的验证。其它 Godot 编辑器构建必须导入
 > 完全匹配的模板包。自动化检查不能替代平台开发者工具和目标真机上的最终验收。
 
-v0.3 的 TikTok 支持仅覆盖 Native runtime，`game.json` 使用小写
-`subpackages`；抖音继续使用 `subPackages`。TikTok HTML runtime 不在本轮范围内。
+v0.3.0 不提供 TikTok 导出；抖音继续使用大小写敏感的 `subPackages`。
 
 首次运行 TikTok 时，先完成 `ttmg setup` 与 `ttmg login`，进入导出目录后运行
 `ttmg init` 并输入同一个 Client Key，最后运行 `ttmg dev`。固定版 CLI 不会把
@@ -89,7 +88,7 @@ TikTok Native 的桌面快捷方式与入口任务已提供强类型 SDK：
 `get_entrance_mission_reward()`。Bridge 会先做能力检查，再调用宿主 API，结果统一由
 `tiktok_mission_result` 返回。
 
-当前 TikTok beta 会对真机宿主可能崩溃或挂起的存储枚举、电池读取和公开文件
+当前保留但已禁用的 TikTok 实现会对真机宿主可能崩溃或挂起的存储枚举、电池读取和公开文件
 系统写入 fail-closed。Key-value Storage 的 get/set/remove 仍受支持并已通过真机验证；
 详细边界见[使用指南](docs/USAGE_zh.md#文件系统)。
 
@@ -132,7 +131,7 @@ cp -R godot_for_minigame/addons/godot_mini_game your_project/addons/godot_mini_g
 
 ### 4 · 导出
 
-打开 **Mini Game Export** Dock，选择一个平台，输入 App ID 或 TikTok Client Key，选择屏幕方向、Web
+打开 **Mini Game Export** Dock，选择一个平台，输入 App ID，选择屏幕方向、Web
 preset 和专用输出目录，然后点击 **Export**。再用对应的平台开发者工具打开结果。
 
 ## 60 秒上手 SDK

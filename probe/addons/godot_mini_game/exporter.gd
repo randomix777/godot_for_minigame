@@ -13,6 +13,8 @@ const PUBLISH_JOURNAL := "journal.json"
 const PUBLISH_JOURNAL_SCHEMA_VERSION := 1
 
 const SUPPORTED_PLATFORMS: PackedStringArray = ["wechat", "douyin", "tiktok", "alipay", "baidu", "qq", "kuaishou"]
+## Implemented targets that are intentionally unavailable in this release.
+const DISABLED_PLATFORMS: PackedStringArray = ["tiktok"]
 const SUPPORTED_ORIENTATIONS: PackedStringArray = ["portrait", "landscape"]
 const PLATFORM_CONTRACTS := {
 	"wechat": {
@@ -521,6 +523,9 @@ func export_mini_game(
 	if not SUPPORTED_PLATFORMS.has(platform):
 		_log("[color=red]不支持的平台: %s[/color]" % platform)
 		return ERR_INVALID_PARAMETER
+	if DISABLED_PLATFORMS.has(platform):
+		_log("[color=red]该平台在 v0.3.0 中已禁用: %s[/color]" % platform)
+		return ERR_UNAVAILABLE
 	if not SUPPORTED_ORIENTATIONS.has(orientation):
 		_log("[color=red]不支持的屏幕方向: %s[/color]" % orientation)
 		return ERR_INVALID_PARAMETER

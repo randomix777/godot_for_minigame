@@ -117,12 +117,8 @@ for (const readme of [english, chinese]) {
   assert.match(readme, /`tt`/);
   assert.match(readme, /`TTMinis\.game`/);
   assert.match(readme, /TikTok Mini Game Native/);
-  assert.match(readme, /43\.4\.0/);
-  assert.match(readme, /`ttmg`/);
-  assert.match(readme, /`ttmg init`/);
-  assert.match(readme, /Missing clientKey/);
+  assert.match(readme, /(?:disabled in v0\.3\.0|v0\.3\.0 中禁用)/);
   assert.match(readme, /`subPackages`/);
-  assert.match(readme, /`subpackages`/);
   assert.doesNotMatch(readme, /Full API Reference|完整 API 参考|Real-device ready|ready for submission|all \d+ methods (?:are )?supported/);
 }
 
@@ -145,10 +141,10 @@ assertSafePng(architectureEnglish, "assets/export-architecture.png", { width: 14
 assertSafePng(architectureEnglishMobile, "assets/export-architecture-mobile.png", { width: 720, height: 1280 }, 2, 950_000);
 assertSafePng(architectureChinese, "assets/export-architecture-zh.png", { width: 1440, height: 960 }, 2, 1_350_000);
 assertSafePng(architectureChineseMobile, "assets/export-architecture-zh-mobile.png", { width: 720, height: 1280 }, 2, 950_000);
-assert.match(english, /each transaction selects one of 7 platforms/);
+assert.match(english, /each transaction selects one of 6 enabled platforms/);
 assert.match(english, /game\.js` selects exactly one `PlatformRuntime` provider/);
 assert.match(english, /not a filesystem-wide crash-atomic primitive/);
-assert.match(chinese, /每次事务从7个平台/);
+assert.match(chinese, /每次事务从6个已启用平台/);
 assert.match(chinese, /game\.js` 只选择一个 `PlatformRuntime` Provider/);
 assert.match(chinese, /不是跨文件系统的 crash-atomic/);
 assert.match(english, new RegExp(`${methods.length} methods and ${signals.length} signals`));

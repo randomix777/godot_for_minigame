@@ -1,14 +1,14 @@
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="assets/banner-dark-v2.png" />
-    <img src="assets/banner-light.png" width="720" alt="A Godot project exported through Godot Mini Game to WeChat, Douyin, and TikTok Mini Games" />
+    <img src="assets/banner-light.png" width="720" alt="A Godot project exported through Godot Mini Game to WeChat and Douyin Mini Games" />
   </picture>
 </p>
 
 <h1 align="center">Godot Mini Game</h1>
 
 <p align="center">
-  <strong>Export Godot games to WeChat, Douyin, and TikTok Mini Games.</strong><br />
+  <strong>Export Godot games to WeChat and Douyin Mini Games.</strong><br />
   CI-validated WASM engine · guarded export transaction · one versioned GDScript SDK
 </p>
 
@@ -30,7 +30,7 @@
 ---
 
 Godot Mini Game turns a normal Godot project into a platform-ready WeChat,
-Douyin, TikTok, Alipay, Baidu, QQ, or Kuaishou Mini Game package. Day-to-day export
+Douyin, Alipay, Baidu, QQ, or Kuaishou Mini Game package. Day-to-day export
 does not require Node.js, Brotli, Emscripten, or a separate Godot Web template download.
 
 ## Why Godot Mini Game?
@@ -53,7 +53,7 @@ does not require Node.js, Brotli, Emscripten, or a separate Godot Web template d
 
 <p align="center"><sub>Click the diagram to open it at full size.</sub></p>
 
-- **Export control plane** — each transaction selects one of 7 platforms (WeChat, Douyin, TikTok, Alipay, Baidu, QQ, Kuaishou), resolves one complete engine bundle, assembles outside the destination, validates every managed artifact, and publishes under a lock.
+- **Export control plane** — each transaction selects one of 6 enabled platforms (WeChat, Douyin, Alipay, Baidu, QQ, Kuaishou), resolves one complete engine bundle, assembles outside the destination, validates every managed artifact, and publishes under a lock.
 - **Exported package runtime** — `game.js` selects exactly one `PlatformRuntime` provider; the loader starts the patched engine and PCK, while `GodotSDK` and `MiniGameSDK` negotiate the Bridge ABI.
 
 The publish step has in-process rollback and records recovery evidence, but is
@@ -71,8 +71,8 @@ not a filesystem-wide crash-atomic primitive. Full boundaries are documented in
 | Runtime contract | Bridge ABI `1` · template schema `1` · output schema `1` |
 
 - ✅ **WeChat Mini Game (`wx`)** — full export, manifest, WASM, and package checks. DevTools + real device verified.
-- ✅ **Douyin Mini Game (`tt`)** — full export, manifest, WASM, and package checks. DevTools verified.
-- 🧪 **TikTok Mini Game Native (`TTMinis.game`)** — **beta** target with automated export checks. Requires TikTok client 43.4.0+, `ttmg` DevTool compilation, and real-device validation before release.
+- ✅ **Douyin Mini Game (`tt`)** — full export, manifest, WASM, and package checks. DevTools + real device verified.
+- ⛔ **TikTok Mini Game Native (`TTMinis.game`)** — disabled in v0.3.0 pending pinned DevTool and real-device validation. Its implementation is retained for future work but is not exposed by the Dock or exporter.
 - 🔬 **Alipay Mini Game (`my`)** — experimental. Automated export smoke only. Requires Alipay DevTools verification.
 - 🔬 **Baidu Mini Game (`swan`)** — experimental. Automated export smoke only. Requires Baidu DevTools verification.
 - 🔬 **QQ Mini Game (`qq`)** — experimental. Automated export smoke only. Requires QQ DevTools verification.
@@ -84,9 +84,8 @@ not a filesystem-wide crash-atomic primitive. Full boundaries are documented in
 > Automated checks do not replace final testing in platform DevTools and on
 > target devices.
 
-TikTok support in v0.3 is for the Native runtime and writes lower-case
-`subpackages`; Douyin continues to require `subPackages`. The TikTok HTML
-runtime is outside this release's scope.
+TikTok export is unavailable in v0.3.0. Douyin continues to require the
+case-sensitive `subPackages` field.
 
 For the first TikTok run, complete `ttmg setup` and `ttmg login`, enter the
 export directory, run `ttmg init` with the same Client Key, then run `ttmg dev`.
@@ -98,7 +97,7 @@ TikTok Native shortcut and entrance missions have typed SDK wrappers:
 and `get_entrance_mission_reward()`. Each call is capability-gated before the
 host API runs and reports through `tiktok_mission_result`.
 
-Current TikTok beta builds fail closed for storage enumeration, battery reads,
+The retained, disabled TikTok implementation fails closed for storage enumeration, battery reads,
 and public file-system writes where real-device host calls can crash or hang.
 Key-value storage get/set/remove remains supported and device-verified; see the
 [usage guide](docs/USAGE.md#file-system) for the exact boundary.
@@ -144,7 +143,7 @@ standard Web export templates do not need to be downloaded.
 ### 4 · Export
 
 Open the **Mini Game Export** Dock, then select one platform, enter the App ID,
-or TikTok Client Key, choose an orientation, Web preset, and dedicated output directory, and click
+choose an orientation, Web preset, and dedicated output directory, and click
 **Export**. Open the result in the matching platform DevTools.
 
 ## SDK in 60 seconds

@@ -27,7 +27,10 @@ export const releaseData = {
     },
     "tiktok": {
       "runtimeType": "native",
-      "supportTier": "beta",
+      "supportTier": "disabled",
+      "enabled": false,
+      "disabledInVersion": "0.3.0",
+      "disabledReason": "Deferred until the pinned ttmg compilation and real-device gates can be completed.",
       "apiNamespace": "TTMinis.game",
       "nativeWebAssembly": "TTWebAssembly",
       "minimumClientVersion": "43.4.0",
@@ -40,9 +43,9 @@ export const releaseData = {
         "independentSubpackage": 4194304
       },
       "validation": {
-        "exportSmoke": "automated",
-        "devtoolCompile": "required",
-        "realDevice": "required-for-release"
+        "exportSmoke": "disabled",
+        "devtoolCompile": "not-applicable",
+        "realDevice": "not-applicable"
       }
     },
     "alipay": {
@@ -106,7 +109,6 @@ export const releaseData = {
     "platforms": {
       "wechat": "automated",
       "douyin": "automated",
-      "tiktok": "automated",
       "alipay": "automated",
       "baidu": "automated",
       "qq": "automated",
@@ -128,7 +130,6 @@ export const releaseData = {
       "platforms": {
         "wechat": "automated",
         "douyin": "automated",
-        "tiktok": "automated",
         "alipay": "automated",
         "baidu": "automated",
         "qq": "automated",

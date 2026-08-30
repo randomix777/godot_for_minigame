@@ -25,9 +25,9 @@ const copy = {
     badge: `开源 · MIT License · v${VERSION}`,
     eyebrow: "Godot 4.x 小游戏导出插件",
     heroA: "把 Godot 游戏，",
-    heroB: "发布到微信、抖音与 TikTok",
+    heroB: "发布到微信与抖音",
     heroBody:
-      "内置小游戏兼容的 WASM 引擎、平台适配层与能力桥接，支持微信、抖音与 TikTok。",
+      "内置小游戏兼容的 WASM 引擎、平台适配层与能力桥接，支持微信与抖音。",
     download: "下载最新版",
     docs: "查看中文文档",
     github: "GitHub",
@@ -42,7 +42,7 @@ const copy = {
     visualDone: "导出完成",
     visualReady: "可直接在开发者工具中打开",
     metrics: [
-      ["3", "小游戏平台"],
+      ["2", "已认证平台"],
       ["20+", "类原生 API"],
       ["≈ 6 MB", "Brotli 引擎"],
       ["MIT", "开源许可"],
@@ -54,9 +54,9 @@ const copy = {
       ["01", "开箱即用", "内置小游戏兼容引擎模板，无需从头配置 Emscripten。"],
       ["02", "一键导出", "自动生成资源包、引擎文件、JS 适配层与平台配置。"],
       ["03", "宿主兼容引擎", "移除小游戏 WebAssembly 不支持的 SIMD、异常 Tag 与线程特性。"],
-      ["04", "三平台交付", "同一套 Godot 项目输出微信、抖音与 TikTok 工程。"],
+      ["04", "双平台交付", "同一套 Godot 项目输出微信与抖音工程。"],
       ["05", "原生能力桥接", "同名能力先检测再调用；支付等平台特有能力走显式映射。"],
-      ["06", "可验证工程链路", "中英文指南、模板构建、自动发布与三平台导出冒烟测试一应俱全。"],
+      ["06", "可验证工程链路", "中英文指南、模板构建、自动发布与多平台导出冒烟测试一应俱全。"],
     ],
     flowKicker: "从项目到真机",
     flowTitle: "四步完成一次交付",
@@ -67,11 +67,11 @@ const copy = {
       ["03", "选择目标平台", "在 Dock 中填写平台标识、方向与输出目录。"],
       ["04", "打开开发者工具", "点击导出，再用对应平台的开发与调试工具打开。"],
     ],
-    architectureTitle: "一套 Godot 工程，分流到三端运行时",
+    architectureTitle: "一套 Godot 工程，分流到已启用运行时",
     architectureBody:
-      "导出器把游戏内容、认证引擎与共享适配层装配成平台工程，再交给微信、抖音和 TikTok 运行时。",
+      "导出器把游戏内容、认证引擎与共享适配层装配成平台工程，再交给微信或抖音运行时。",
     architectureCaption:
-      "Godot Mini Game 架构：Godot 4.x 项目进入导出器，导出器装配游戏资源包、认证引擎模板、共享浏览器适配与平台桥，最后分流到微信、抖音和 TikTok 运行时。",
+      "Godot Mini Game 架构：Godot 4.x 项目进入导出器，导出器装配游戏资源包、认证引擎模板、共享浏览器适配与平台桥，最后分流到微信或抖音运行时。",
     architectureProject: ["Godot 4.x 项目", "场景、脚本、资源和 Web 导出预设"],
     architectureExporter: ["Godot Mini Game Exporter", "一次导出事务，完成资源打包、引擎选择与平台装配。"],
     architectureModules: [
@@ -84,7 +84,6 @@ const copy = {
     architectureRuntimes: [
       ["WeChat", "微信小游戏", "/wechat.svg"],
       ["Douyin", "抖音小游戏", "/douyin.svg"],
-      ["TikTok", "TikTok Mini Game", "/tiktok.svg"],
     ],
     techKicker: "真实设备优先",
     techTitle: "不是“模拟器能跑”，而是真机可用",
@@ -94,7 +93,7 @@ const copy = {
       ["wasm_simd=no", "避开真机 SIMD 编译错误"],
       ["threads=no", "适配小游戏线程限制"],
       ["Brotli", "引擎压缩后约 6 MB"],
-      ["Subpackages", "抖音用 subPackages；微信与 TikTok 用 subpackages"],
+      ["Subpackages", "抖音使用 subPackages；微信使用 subpackages"],
     ],
     templateNote: `v${VERSION} 认证 Godot ${GODOT_VERSION} · commit ${GODOT_COMMIT_SHORT}… · Emscripten ${EMSCRIPTEN_VERSION} · Bridge ABI ${BRIDGE_ABI} · r${TEMPLATE_REVISION}；发布前仍需完成目标平台真机验证。`,
     sdkKicker: "MiniGameSDK",
@@ -130,9 +129,9 @@ const copy = {
     badge: `Open source · MIT License · v${VERSION}`,
     eyebrow: "Mini-game exporter for Godot 4.x",
     heroA: "Ship your Godot game",
-    heroB: "to WeChat, Douyin & TikTok",
+    heroB: "to WeChat & Douyin",
     heroBody:
-      "A mini-game-compatible WASM engine, platform adapters, and capability bridge for WeChat, Douyin, and TikTok.",
+      "A mini-game-compatible WASM engine, platform adapters, and capability bridge for WeChat and Douyin.",
     download: "Download latest",
     docs: "Read English docs",
     github: "GitHub",
@@ -147,7 +146,7 @@ const copy = {
     visualDone: "Export complete",
     visualReady: "Ready to open in platform DevTools",
     metrics: [
-      ["3", "mini-game platforms"],
+      ["2", "certified platforms"],
       ["20+", "native API groups"],
       ["≈ 6 MB", "Brotli engine"],
       ["MIT", "open-source license"],
@@ -159,9 +158,9 @@ const copy = {
       ["01", "Zero configuration", "A compatible engine template is bundled. No Emscripten setup for everyday use."],
       ["02", "One-click export", "Generate the pack, engine, JavaScript adapters, and platform configuration together."],
       ["03", "Host-compatible engine", "Avoid WASM SIMD, exception-tag, and threading features unsupported by mini-game hosts."],
-      ["04", "Three platforms", "Export one Godot project to WeChat, Douyin, and TikTok projects."],
+      ["04", "Two platforms", "Export one Godot project to WeChat and Douyin projects."],
       ["05", "Native API bridge", "Gate same-name capabilities and explicitly map payments and other host-specific flows."],
-      ["06", "Verifiable toolchain", "Bilingual docs, template builds, automated releases, and three-platform export smoke tests."],
+      ["06", "Verifiable toolchain", "Bilingual docs, template builds, automated releases, and multi-platform export smoke tests."],
     ],
     flowKicker: "Project to device",
     flowTitle: "A complete delivery in four steps",
@@ -172,11 +171,11 @@ const copy = {
       ["03", "Choose a platform", "Set the platform ID, orientation, and output folder in the Dock."],
       ["04", "Open DevTools", "Export once, then open the result with the matching platform development tools."],
     ],
-    architectureTitle: "One Godot project, routed to three runtimes",
+    architectureTitle: "One Godot project, routed to enabled runtimes",
     architectureBody:
-      "The exporter assembles game content, a certified engine, and a shared adapter into projects for WeChat, Douyin, and TikTok.",
+      "The exporter assembles game content, a certified engine, and a shared adapter into projects for WeChat and Douyin.",
     architectureCaption:
-      "Godot Mini Game architecture: a Godot 4.x project enters the exporter, which assembles the game resource pack, certified engine templates, shared browser adapter, and platform bridge before routing the result to WeChat, Douyin, and TikTok runtimes.",
+      "Godot Mini Game architecture: a Godot 4.x project enters the exporter, which assembles the game resource pack, certified engine templates, shared browser adapter, and platform bridge before routing the result to WeChat or Douyin runtimes.",
     architectureProject: ["Godot 4.x project", "Scenes, scripts, assets, and a Web export preset"],
     architectureExporter: ["Godot Mini Game Exporter", "One export transaction packages resources, selects the engine, and assembles the platform project."],
     architectureModules: [
@@ -189,7 +188,6 @@ const copy = {
     architectureRuntimes: [
       ["WeChat", "WeChat Mini Game", "/wechat.svg"],
       ["Douyin", "Douyin Mini Game", "/douyin.svg"],
-      ["TikTok", "TikTok Mini Game", "/tiktok.svg"],
     ],
     techKicker: "Real devices first",
     techTitle: "Beyond “it works in the simulator”",
@@ -199,7 +197,7 @@ const copy = {
       ["wasm_simd=no", "Avoid device-side SIMD compile errors"],
       ["threads=no", "Respect mini-game thread limits"],
       ["Brotli", "Compress the engine to about 6 MB"],
-      ["Subpackages", "Douyin uses subPackages; WeChat and TikTok use subpackages"],
+      ["Subpackages", "Douyin uses subPackages; WeChat uses subpackages"],
     ],
     templateNote: `v${VERSION} certifies Godot ${GODOT_VERSION} · commit ${GODOT_COMMIT_SHORT}… · Emscripten ${EMSCRIPTEN_VERSION} · Bridge ABI ${BRIDGE_ABI} · r${TEMPLATE_REVISION}; complete a real-device gate on the target platform before release.`,
     sdkKicker: "MiniGameSDK",
@@ -337,7 +335,6 @@ export default function Home() {
               <span>{t.supports}</span>
               <span className="platform-chip"><img src={asset("/wechat.svg")} alt="" />WeChat</span>
               <span className="platform-chip"><img src={asset("/douyin.svg")} alt="" />Douyin</span>
-              <span className="platform-chip"><img src={asset("/tiktok.svg")} alt="" />TikTok</span>
             </div>
           </div>
 
@@ -402,8 +399,6 @@ export default function Home() {
                     <span><img src={asset("/wechat.svg")} alt="WeChat" /></span>
                     <i>+</i>
                     <span><img src={asset("/douyin.svg")} alt="Douyin" /></span>
-                    <i>+</i>
-                    <span><img src={asset("/tiktok.svg")} alt="TikTok" /></span>
                   </div>
                 </aside>
               </div>
@@ -605,7 +600,7 @@ export default function Home() {
       <section className="final-cta">
         <div className="final-grid" aria-hidden="true" />
         <div className="container final-content reveal">
-          <div className="final-logos"><span><img src={asset("/godot.svg")} alt="Godot" /></span><i>→</i><span><img src={asset("/wechat.svg")} alt="WeChat" /></span><span><img src={asset("/douyin.svg")} alt="Douyin" /></span><span><img src={asset("/tiktok.svg")} alt="TikTok" /></span></div>
+          <div className="final-logos"><span><img src={asset("/godot.svg")} alt="Godot" /></span><i>→</i><span><img src={asset("/wechat.svg")} alt="WeChat" /></span><span><img src={asset("/douyin.svg")} alt="Douyin" /></span></div>
           <h2>{t.finalTitle}</h2>
           <p>{t.finalBody}</p>
           <div className="hero-actions">

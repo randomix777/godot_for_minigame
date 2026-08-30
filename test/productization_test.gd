@@ -95,6 +95,8 @@ func _test_export_dock_exists() -> void:
 		_assert(content.contains("extends"), "export_dock.gd extends a class")
 		_assert(content.contains("platform") or content.contains("Platform"),
 			"export_dock.gd references platform selection")
+		_assert(not content.contains('["TikTok Mini Game", "tiktok"]'),
+			"TikTok is hidden from the v0.3.0 export Dock")
 	print("")
 
 

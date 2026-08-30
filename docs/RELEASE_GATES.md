@@ -7,12 +7,12 @@
 | Node.js tests (13) | ✅ PASS | 13/13 on Node.js v24.18.0 (incl. sha256sums_test.mjs) |
 | Godot 4.6.1 headless import | ⚠️ N/A | Exit code 1 with no error output (expected for headless import) |
 | Godot 4.6.1 smoke tests (13) | ✅ PASS | 13/13 — all test/*_test.gd |
-| Export smoke (7 platforms) | ✅ PASS | wechat, douyin, tiktok, alipay, baidu, qq, kuaishou |
+| Export smoke (6 enabled platforms) | ✅ PASS | wechat, douyin, alipay, baidu, qq, kuaishou |
 | Package reproducibility | ✅ PASS | Identical SHA-256 across runs |
 | Plugin packaging | ✅ PASS | Deterministic ZIP via scripts/package_plugin.mjs |
 | Website build | ✅ PASS | vinext build succeeds |
 | Website tests (3) | ✅ PASS | 3/3 rendered HTML tests |
-| Website lint | ✅ PASS | 0 errors, 18 warnings (img element — acceptable) |
+| Website lint | ✅ PASS | 0 errors, 15 warnings (img element — acceptable) |
 | SHA256SUMS validation | ✅ PASS | 64 entries, UTF-8 no BOM, LF line endings, sorted |
 
 ### Node.js Test Files (test/*.test.mjs)
@@ -60,8 +60,8 @@
 | Platform | API | Export Smoke | DevTools Compilation | Real Device | Status |
 |----------|-----|-------------|---------------------|-------------|--------|
 | 微信小游戏 (WeChat) | `wx` | ✅ Automated | ✅ Manual (2026-08-29) | ✅ Manual (2026-08-29) | Certified |
-| 抖音小游戏 (Douyin) | `tt` | ✅ Automated | ✅ Manual (2026-08-29) | 🔴 Pending | Certified (real device pending) |
-| TikTok Mini Game | `TTMinis.game` | ✅ Automated | 🟡 Partial (ttmg v0.4.5) | 🔴 Pending | Beta |
+| 抖音小游戏 (Douyin) | `tt` | ✅ Automated | ✅ Manual (2026-08-29) | ✅ Manual (2026-08-29) | Certified |
+| TikTok Mini Game | `TTMinis.game` | ⛔ Disabled | N/A | N/A | Disabled for v0.3.0 |
 | 支付宝小游戏 (Alipay) | `my` | ✅ Automated | 🔴 Not verified | 🔴 Not verified | Experimental |
 | 百度小游戏 (Baidu) | `swan` | ✅ Automated | 🔴 Not verified | 🔴 Not verified | Experimental |
 | QQ小游戏 (QQ) | `qq` | ✅ Automated | 🔴 Not verified | 🔴 Not verified | Experimental |
@@ -94,57 +94,40 @@
 **Evidence**: Console shows `[Loader] ✓ 加载完成，游戏已启动`. No errors.
 **Fix applied**: Added `GameGlobal.__platform = "douyin"` before platform_runtime load.
 
+### ✅ PASSED: Douyin Real Device Test
+
+**What**: Run the exported project on a physical device with Douyin installed.
+**Result**: ✅ PASSED — 2026-08-29
+**Evidence**: User confirmed that the game loads and runs correctly on the physical device.
+
+### ⛔ DISABLED: TikTok Mini Game
+
+TikTok export is intentionally unavailable in v0.3.0. The implementation and
+templates remain in the repository for future work, but the Dock hides the
+target and the exporter rejects direct TikTok export requests. Its previous
+`ttmg` and real-device gates are therefore not release blockers for v0.3.0.
+
 ---
 
 ## Git Status
 
 | Item | Status |
 |------|--------|
-| Working tree | ✅ Clean |
-| fork/main | ✅ Synced (3 commits ahead of origin/main) |
-| origin/main | ⚠️ 3 commits behind (we are ahead) |
-| upstream/main | ⚠️ 31 commits ahead (unrelated history) |
+| Working tree | 🔴 Dirty (20 modified files, awaiting commit) |
+| Current HEAD | `1eed628` |
+| origin/main | 4 commits behind HEAD |
+| fork/main | ✅ Synced with HEAD |
+| upstream/main | 31 commits ahead of HEAD (unrelated history) |
 
-**Note**: Current `main` has 3 commits ahead of `origin/main` (AnranS/godot_for_minigame) because this is a fork. The fork (`randomix777/godot_for_minigame`) is synced.
+**Note**: After committing the pending changes, HEAD will be 5 commits ahead of origin/main (AnranS/godot_for_minigame) because this is a fork. The fork (`randomix777/godot_for_minigame`) is synced with HEAD.
 
 ---
 
 ## Manual Gates Still Required
 
-### 🔴 BLOCKING: Douyin Real Device Test
-
-**What**: Test on a real device with Douyin installed.
-**Why**: Required to validate runtime behavior beyond DevTools compilation.
-**Evidence needed**: Screenshot of game running + console output
-**Steps**:
-1. Export probe project to Douyin
-2. Open in Douyin DevTools
-3. Scan QR code with Douyin app on phone
-4. Verify game loads and runs
-**Blocking**: Yes — required for release
-
-### 🔴 BLOCKING: TikTok Compilation with ttmg v0.4.1-beta.wasm1
-
-**What**: Export to TikTok, compile with ttmg v0.4.1-beta.wasm1 (not v0.4.5).
-**Why**: support-matrix.json specifies ttmg v0.4.1-beta.wasm1 for TikTok.
-**Evidence needed**: ttmg compilation log + success output
-**Steps**:
-1. Export probe project to TikTok directory
-2. Install ttmg v0.4.1-beta.wasm1: `npm install -g @ttmg/cli@0.4.1-beta.wasm1`
-3. Run `ttmg dev --client-key <key>` in export directory
-4. Verify compilation succeeds
-**Blocking**: Yes — required for release
-
-### 🔴 BLOCKING: TikTok Real Device Test
-
-**What**: Test on device with TikTok v43.4.0+ installed.
-**Why**: TikTok runtime is beta — real device verification is mandatory.
-**Evidence needed**: Screenshot of game running on TikTok
-**Steps**:
-1. After ttmg compilation succeeds
-2. Scan QR code with TikTok v43.4.0+ on phone
-3. Verify game loads and runs
-**Blocking**: Yes — required for release
+No manual device gate remains for the enabled v0.3.0 targets. Experimental
+targets remain automated-smoke-only and are not certified until their own
+DevTools and device evidence is recorded.
 
 ---
 
@@ -155,9 +138,9 @@
 | WeChat | 微信开发者工具 | v2.01.2510290 | ✅ Verified |
 | WeChat | WeChat client | 8.0+ | ✅ Verified |
 | Douyin | 抖音开发者工具 | v4.5.5 | ✅ Verified |
-| Douyin | Douyin client | Latest | 🔴 Pending |
-| TikTok | ttmg | v0.4.1-beta.wasm1 | 🟡 v0.4.5 tested, need v0.4.1-beta.wasm1 |
-| TikTok | TikTok client | 43.4.0+ | 🔴 Pending |
+| Douyin | Douyin client | Latest | ✅ Verified |
+| TikTok | ttmg | N/A | ⛔ Disabled for v0.3.0 |
+| TikTok | TikTok client | N/A | ⛔ Disabled for v0.3.0 |
 | Alipay | 支付宝开发者工具 | Latest | 🔴 Not verified |
 | Baidu | 百度开发者工具 | Latest | 🔴 Not verified |
 | QQ | QQ开发者工具 | Latest | 🔴 Not verified |
@@ -169,17 +152,16 @@
 
 - [x] All Node.js automated tests pass (13/13)
 - [x] All Godot automated tests pass (13/13 on 4.6.1)
-- [x] Export smoke test passes (7 platforms)
+- [x] Export smoke test passes (6 enabled platforms)
 - [x] Plugin packages correctly (deterministic ZIP)
 - [x] Version metadata consistent (0.3.0 everywhere)
 - [x] Website build/test/lint pass on Windows
-- [x] **Git working tree clean** — ✅ Completed
+- [ ] **Git working tree clean** — PENDING (after commit)
 - [x] **WeChat DevTools compilation** — ✅ PASSED 2026-08-29
 - [x] **WeChat real device test** — ✅ PASSED 2026-08-29
 - [x] **Douyin DevTools compilation** — ✅ PASSED 2026-08-29
-- [ ] **Douyin real device test** — BLOCKING
-- [ ] **TikTok compilation (ttmg v0.4.1-beta.wasm1)** — BLOCKING
-- [ ] **TikTok real device test** — BLOCKING
+- [x] **Douyin real device test** — ✅ PASSED 2026-08-29
+- [x] **TikTok export disabled for v0.3.0**
 
 ---
 
@@ -189,4 +171,4 @@
 - Do NOT create or push a git tag until all blockers are cleared
 - Do NOT mark Godot 4.7.1 as certified (template asset not available)
 - Do NOT mark experimental platforms (alipay/baidu/qq/kuaishou) as certified without DevTools verification
-- Do NOT use ttmg v0.4.5 as evidence for TikTok v0.4.1-beta.wasm1 requirement
+- Do NOT re-enable TikTok without pinned DevTool compilation and real-device evidence

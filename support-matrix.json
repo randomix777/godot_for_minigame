@@ -28,7 +28,10 @@
     },
     "tiktok": {
       "runtimeType": "native",
-      "supportTier": "beta",
+      "supportTier": "disabled",
+      "enabled": false,
+      "disabledInVersion": "0.3.0",
+      "disabledReason": "Deferred until the pinned ttmg compilation and real-device gates can be completed.",
       "apiNamespace": "TTMinis.game",
       "nativeWebAssembly": "TTWebAssembly",
       "minimumClientVersion": "43.4.0",
@@ -41,9 +44,9 @@
         "independentSubpackage": 4194304
       },
       "validation": {
-        "exportSmoke": "automated",
-        "devtoolCompile": "required",
-        "realDevice": "required-for-release"
+        "exportSmoke": "disabled",
+        "devtoolCompile": "not-applicable",
+        "realDevice": "not-applicable"
       }
     },
     "alipay": {
@@ -106,7 +109,6 @@
       "platforms": {
         "wechat": "automated",
         "douyin": "automated",
-        "tiktok": "automated",
         "alipay": "automated",
         "baidu": "automated",
         "qq": "automated",

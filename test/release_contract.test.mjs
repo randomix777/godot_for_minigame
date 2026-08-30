@@ -22,6 +22,7 @@ assert.ok(Number.isInteger(supportMatrix.templateSchema) && supportMatrix.templa
 assert.ok(Number.isInteger(supportMatrix.outputManifestSchema) && supportMatrix.outputManifestSchema > 0);
 assert.ok(Array.isArray(supportMatrix.certified) && supportMatrix.certified.length > 0);
 const expectedPlatforms = ["alipay", "baidu", "douyin", "kuaishou", "qq", "tiktok", "wechat"];
+const enabledPlatforms = expectedPlatforms.filter((platform) => platform !== "tiktok");
 assert.deepEqual(
   Object.keys(supportMatrix.platformContracts || {}).sort(),
   expectedPlatforms,
@@ -35,7 +36,9 @@ assert.equal(douyinContract.runtimeType, "native");
 assert.equal(douyinContract.apiNamespace, "tt");
 assert.equal(douyinContract.subpackageField, "subPackages");
 assert.equal(tiktokContract.runtimeType, "native");
-assert.equal(tiktokContract.supportTier, "beta");
+assert.equal(tiktokContract.supportTier, "disabled");
+assert.equal(tiktokContract.enabled, false);
+assert.equal(tiktokContract.disabledInVersion, "0.3.0");
 assert.equal(tiktokContract.apiNamespace, "TTMinis.game");
 assert.equal(tiktokContract.subpackageField, "subpackages");
 assert.equal(tiktokContract.devtool, "ttmg");
@@ -55,8 +58,8 @@ for (const target of supportMatrix.certified) {
   assert.equal(target.target, "release");
   assert.deepEqual(
     Object.keys(target.platforms || {}).sort(),
-    expectedPlatforms,
-    "every certification row must classify all exported platforms",
+    enabledPlatforms,
+    "every certification row must classify all enabled export platforms",
   );
   assert.ok(target.template && ["bundled", "release"].includes(target.template.source));
   if (target.template.source === "release") {
@@ -85,6 +88,11 @@ const sdkSource = read("addons/godot_mini_game/templates/common/js/libs/sdk.js")
 const gdSdkSource = read("addons/godot_mini_game/MiniGameSDK.gd");
 const templateBundleSource = read("addons/godot_mini_game/core/template_bundle.gd");
 const outputGuardSource = read("addons/godot_mini_game/core/output_guard.gd");
+const exporterSource = read("addons/godot_mini_game/exporter.gd");
+const exportDockSource = read("addons/godot_mini_game/export_dock.gd");
+assert.match(exporterSource, /DISABLED_PLATFORMS[^\n]*\["tiktok"\]/);
+assert.match(exporterSource, /DISABLED_PLATFORMS\.has\(platform\)/);
+assert.doesNotMatch(exportDockSource, /\["TikTok Mini Game",\s*"tiktok"\]/);
 const runtimeAbi = Number(runtimeSource.match(/const BRIDGE_ABI_VERSION = (\d+);/)?.[1]);
 const gdAbi = Number(gdSdkSource.match(/const BRIDGE_ABI_VERSION := (\d+)/)?.[1]);
 const templateAbi = Number(templateBundleSource.match(/const BRIDGE_ABI := (\d+)/)?.[1]);

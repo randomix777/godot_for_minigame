@@ -31,6 +31,8 @@ func _run() -> void:
 		"godot-mini-game-smoke-%d-%d" % [OS.get_process_id(), Time.get_ticks_usec()]
 	)
 	for platform in Exporter.SUPPORTED_PLATFORMS:
+		if Exporter.DISABLED_PLATFORMS.has(platform):
+			continue
 		var output := root.path_join(platform)
 		var err := await exporter.export_mini_game(
 			platform, "test-app", "portrait", preset_name, output)
