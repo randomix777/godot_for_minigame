@@ -1507,6 +1507,34 @@ func _patch_godot_js(path: String, platform: String = "wechat") -> Error:
 		_log("  [color=red]godot.js 缺少 WebGL 能力检测补丁锚点[/color]")
 		return ERR_FILE_CORRUPT
 
+	# ── Commit-frame wrapper (ported from upstream d660872) ────────────
+	# WeChat / Douyin / TikTok mini-game runtimes need explicit WebGL
+	# context.flush() + context.commit() after each frame.  The upstream
+	# Godot 4.7 template bundles this, but 4.6.x godot.js only aliases
+	# _emscripten_webgl_commit_frame to the do_commit_frame stub without
+	# the additional flush/commit calls.  Wrap the original so the
+	# graphics pipeline drains on every platform.
+	var _commit_frame_anchor := "var _emscripten_webgl_commit_frame=_emscripten_webgl_do_commit_frame;"
+	var _commit_frame_marker := "var __godotMinigameOriginalCommitFrame=_emscripten_webgl_commit_frame;"
+	if content.find(_commit_frame_marker) != -1:
+		pass  # already patched (e.g. 4.7+ template)
+	elif content.find(_commit_frame_anchor) != -1:
+		var _commit_frame_patch := (
+			_commit_frame_anchor + "\n"
+			+ "var __godotMinigameOriginalCommitFrame=_emscripten_webgl_commit_frame;"
+			+ "_emscripten_webgl_commit_frame=function(){"
+			+ "var result=__godotMinigameOriginalCommitFrame();"
+			+ "var context=typeof GL!==\"undefined\"&&GL.currentContext&&GL.currentContext.GLctx;"
+			+ "if(context){"
+			+ "if(typeof context.flush===\"function\")context.flush();"
+			+ "if(typeof context.commit===\"function\")context.commit();"
+			+ "}return result;};"
+		)
+		content = content.replace(_commit_frame_anchor, _commit_frame_patch)
+		modified = true
+	else:
+		_log("  [color=yellow]godot.js 缺少 commit-frame 补丁锚点（可能已是 4.7+ 模板）[/color]")
+
 	# Godot's wrapper starts WebAssembly instantiation asynchronously but returns
 	# an empty object, while Emscripten ignores that async operation entirely.
 	# A native mini-game instantiate rejection therefore leaves the permanent

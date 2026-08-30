@@ -33,6 +33,22 @@
       "sha256": "",
       "sizeBytes": 0,
       "bundled": false
+    },
+    {
+      "versionKey": "4.7.2_stable_2d_full_release_r1",
+      "godotVersion": "4.7.2.stable",
+      "godotTag": "4.7.2-stable",
+      "godotCommit": "ed1daf0bf001b61586d9930840f2f1394092c079",
+      "emscriptenVersion": "4.0.3",
+      "profile": "2d_full",
+      "target": "release",
+      "templateRevision": 1,
+      "bridgeAbi": 1,
+      "filename": "godot_minigame_template_4.7.2-stable_emsdk-4.0.3_2d-full_release_abi-1_r1.zip",
+      "downloadUrl": "https://github.com/user/godot-minigame/releases/download/template-4.7.2-stable/godot_minigame_template_4.7.2-stable_emsdk-4.0.3_2d-full_release_abi-1_r1.zip",
+      "sha256": "",
+      "sizeBytes": 0,
+      "bundled": false
     }
   ]
 }
