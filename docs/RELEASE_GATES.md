@@ -113,13 +113,13 @@ target and the exporter rejects direct TikTok export requests. Its previous
 
 | Item | Status |
 |------|--------|
-| Working tree | 🔴 Dirty (20 modified files, awaiting commit) |
-| Current HEAD | `1eed628` |
-| origin/main | 4 commits behind HEAD |
-| fork/main | ✅ Synced with HEAD |
+| Working tree | ✅ Clean |
+| Current HEAD | `a3b1294` |
+| origin/main | 5 commits behind HEAD |
+| fork/main | ⚠️ 1 commit behind HEAD (awaiting push) |
 | upstream/main | 31 commits ahead of HEAD (unrelated history) |
 
-**Note**: After committing the pending changes, HEAD will be 5 commits ahead of origin/main (AnranS/godot_for_minigame) because this is a fork. The fork (`randomix777/godot_for_minigame`) is synced with HEAD.
+**Note**: After committing the pending changes, HEAD will be 5 commits ahead of origin/main (AnranS/godot_for_minigame) because this is a fork. The fork (`randomix777/godot_for_minigame`) will be synced after push.
 
 ---
 
@@ -150,18 +150,21 @@ DevTools and device evidence is recorded.
 
 ## Release Checklist
 
-- [x] All Node.js automated tests pass (13/13)
+- [x] All Node.js automated tests pass (12/12)
 - [x] All Godot automated tests pass (13/13 on 4.6.1)
 - [x] Export smoke test passes (6 enabled platforms)
 - [x] Plugin packages correctly (deterministic ZIP)
 - [x] Version metadata consistent (0.3.0 everywhere)
 - [x] Website build/test/lint pass on Windows
-- [ ] **Git working tree clean** — PENDING (after commit)
+- [x] **Git working tree clean** — ✅ Completed (a3b1294)
 - [x] **WeChat DevTools compilation** — ✅ PASSED 2026-08-29
 - [x] **WeChat real device test** — ✅ PASSED 2026-08-29
 - [x] **Douyin DevTools compilation** — ✅ PASSED 2026-08-29
 - [x] **Douyin real device test** — ✅ PASSED 2026-08-29
 - [x] **TikTok export disabled for v0.3.0**
+- [ ] **Remote CI green** — PENDING (after push)
+- [ ] **v0.3.0 tag created** — PENDING
+- [ ] **GitHub Release published** — PENDING
 
 ---
 
